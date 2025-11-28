@@ -1,0 +1,3 @@
+name = "scribe:audit"
+description = "Critiques the logic, consistency, and completeness of content."
+prompt = "Audit the following content: {{.Args}}"

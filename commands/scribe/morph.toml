@@ -1,0 +1,3 @@
+name = "scribe:morph"
+description = "Converts a document from one format to another."
+prompt = "Morph the following content: {{.Args}}"
