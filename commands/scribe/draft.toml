@@ -7,16 +7,34 @@ prompt = """
 
 A user has requested you draft the document for the project: {{args}}
 
-## 1. Specific Drafting Protocol
-*   **Context:** You MUST read `scribe/{{args}}/BLUEPRINT.md`, `scribe/{{args}}/RESEARCH.md`, and `styleguide.md` (if exists).
-*   **Target:** Create `scribe/{{args}}/DRAFT.md`.
-*   **Collision Check:** If `DRAFT.md` exists, **ASK THE USER** before overwriting.
+## 1. Drafting Protocol (Strict Rules)
+*   **Mandatory File Discovery:** Your first action MUST be to locate and read `BLUEPRINT.md`, `RESEARCH.md` (if it exists), and `styleguide.md` (if it exists), all within the current project's dedicated directory (e.g., `scribe/{{args}}/`). Use your tools to search for them before proceeding. If `BLUEPRINT.md` is missing, inform the user and stop.
+*   **No New Scope:** Do not introduce new sections or ideas that are not in the `BLUEPRINT.md`. Your job is to flesh out the existing plan, not to expand it.
+*   **Clarify Ambiguity:** Before creating `DRAFT.md`, if the user's request is vague, ambiguous, or if there are conflicts with `BLUEPRINT.md` or `RESEARCH.md`, you must present a brief summary of your understanding and ask clarifying questions to ensure the draft is accurate and complete. If the request is clear, proceed directly.
+*   **Output:** Your final output MUST be a new file named `DRAFT.md` within the current project's dedicated directory.
 
-## 2. Output Format (`DRAFT.md`)
-*   Complete, formatted Markdown document.
-*   Follow `BLUEPRINT.md` structure exactly.
-*   Incorporate facts from `RESEARCH.md`.
-*   Adhere to `styleguide.md`.
+## 2. File Handling
+*   **Collision Check (`DRAFT.md`):**
+    *   Check if `DRAFT.md` already exists within the current project's directory.
+    *   If it exists, **stop and ask the user** how to proceed. You must offer at least these options:
+        1.  **Overwrite:** Replace the existing file.
+        2.  **New Version:** Create a new versioned file (e.g., `DRAFT_v2.md`).
+        3.  **New Git Branch:** Offer to create a new Git branch to isolate this workflow (assuming the user is operating within a Git repository).
+    *   Do not write content until you have a decision.
+
+## 3. The "Draft" Output Format
+*   Your output in `DRAFT.md` should be the complete, formatted document.
+*   Follow the structure from `BLUEPRINT.md` precisely.
+*   Incorporate facts and data from `RESEARCH.md`.
+*   Apply all styling rules from `styleguide.md`.
+
+## 4. Error Handling
+*   If `BLUEPRINT.md` is not found, inform the user and suggest running `/scribe:plan` for the given project name.
+*   If file write operations fail, provide specific error messages and suggested solutions.
+
+## 5. File Validation
+*   Verify that `DRAFT.md` (after creation) contains valid Markdown formatting.
+*   Verify that `BLUEPRINT.md` and `RESEARCH.md` are valid and readable before processing their content.
 
 ---
 *User Request: {{args}}*

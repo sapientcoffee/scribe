@@ -7,18 +7,34 @@ prompt = """
 
 A user has provided feedback to update `DRAFT.md` for the project: {{args}}
 
-## 1. Specific Iteration Protocol
-*   **Context:** You MUST read `scribe/{{args}}/DRAFT.md` and `scribe/{{args}}/CRITIQUE.md`.
-*   **Constraint:** Only apply fixes explicitly requested by the user or present in the critique.
-*   **Target:** Overwrite `scribe/{{args}}/DRAFT.md`.
-*   **Collision Check:** Warn the user that this overwrites the file. Offer Git branch creation.
+## 1. Iteration Protocol (Strict Rules)
+*   **Mandatory File Discovery:** Your first action MUST be to locate and read `DRAFT.md` and `CRITIQUE.md` within the current project's dedicated directory (e.g., `scribe/{{args}}/`). Use your tools to search for them before proceeding. If either file is missing, inform the user and stop.
+*   **Follow User Instructions:** You must ONLY apply the fixes explicitly mentioned in the user's request. Do not address every point in the critique unless asked to.
+*   **Gather Context:** You MUST read and use the discovered files to inform your changes:
+    1.  `DRAFT.md` (The current version of the document).
+    2.  `CRITIQUE.md` (The feedback report).
+    3.  `styleguide.md` (If it exists, to ensure the new changes still adhere to the style guide).
+*   **Output:** You MUST overwrite the existing `DRAFT.md` file within the current project's dedicated directory with the updated content.
 
-## 2. Workflow
-1.  **Read:** `DRAFT.md` and `CRITIQUE.md`.
-2.  **Analyze:** User feedback.
-3.  **Rewrite:** Update `DRAFT.md`.
-4.  **Verify:** Check against `styleguide.md`.
-5.  **Save:** Overwrite `DRAFT.md`.
+## 2. File Handling
+*   **Collision Check (`DRAFT.md`):**
+    *   Since this command overwrites `DRAFT.md`, inform the user about this action before proceeding. Offer to create a new Git branch if they want to preserve the current state (assuming the user is operating within a Git repository).
+    *   Do not write content until you have a decision.
+
+## 3. The "Iteration" Workflow
+1.  **Read:** Load `DRAFT.md` and `CRITIQUE.md` into your context.
+2.  **Analyze:** Parse the user's feedback to understand which points from `CRITIQUE.md` to address.
+3.  **Rewrite:** Modify the content of `DRAFT.md` according to the user's instructions.
+4.  **Verify:** Do a final check to ensure the changes are correct and that the document still adheres to `styleguide.md`.
+5.  **Save:** Overwrite the original `DRAFT.md` with the new, improved version.
+
+## 4. Error Handling
+*   If `DRAFT.md` or `CRITIQUE.md` is not found, inform the user and suggest running the appropriate previous command (e.g., `/scribe:draft` or `/scribe:review`).
+*   If file write operations fail, provide specific error messages and suggested solutions.
+
+## 5. File Validation
+*   Verify that `DRAFT.md` (after modification) contains valid Markdown formatting.
+*   Verify that `CRITIQUE.md` is valid and readable before processing its content.
 
 ---
 *User Request: {{args}}*

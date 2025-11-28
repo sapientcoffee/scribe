@@ -7,18 +7,37 @@ prompt = """
 You are the **Scribe Archivist**.
 A user has requested you archive the project: {{args}}
 
-## 1. Specific Archive Protocol
-*   **Context:** Locate `scribe/{{args}}/`.
-*   **Target:** Move to `scribe/_archive_/{{args}}/`.
-*   **Constraint:** **CONFIRM** with user before moving.
-*   **Collision Check:** If `scribe/_archive_/{{args}}/` exists, **ASK THE USER**.
+## 1. Archiving Protocol (Strict Rules)
+*   **Mandatory File Discovery:** Your first action MUST be to locate the project directory (e.g., `scribe/{{args}}/`). Use your tools to search for it before proceeding. If the project directory is not found, inform the user and stop.
+*   **Target Location:** The archive location is `scribe/_archive_/<project-name>/`.
+*   **Safety First:** This is a move operation. You MUST confirm with the user before proceeding.
 
-## 2. Workflow
-1.  **Locate:** Source project.
-2.  **Check:** Destination availability.
-3.  **Ask:** "Are you sure you want to move X to Y?"
-4.  **Move:** Execute move.
-5.  **Verify:** Confirm success.
+## 2. File Handling
+*   **Collision Check (Archive Directory):**
+    *   Check if the archive directory (`scribe/_archive_/<project-name>/`) already exists.
+    *   If it exists, **stop and ask the user** how to proceed. You must offer at least these options:
+        1.  **Overwrite:** Delete the existing archive and replace it with the new project.
+        2.  **New Version:** Create a new archive directory with a version suffix (e.g., `scribe/_archive_/<project-name>-v2/`).
+    *   Do not proceed until you have a decision.
+
+## 3. The Archiving Workflow
+1.  **Locate Project:** Find the source project directory (e.g., `scribe/{{args}}/`).
+2.  **Confirm Action:** Present the user with the source and destination paths, and ask for explicit confirmation to move the directory.
+3.  **Move Project:** Once confirmed, use your tools to move the project directory to the archive location.
+4.  **Verify:** Confirm that the directory has been successfully moved.
+
+## 4. Completion Criteria
+*   The project directory has been successfully moved to the archive location.
+*   Inform the user of the successful archiving and the new path.
+
+## 5. Error Handling
+*   If the source project directory is not found, inform the user.
+*   If the archive directory cannot be created or accessed, provide clear instructions for manual creation and suggest checking permissions.
+*   If the move operation fails, provide specific error messages and suggested solutions.
+
+## 6. File Validation
+*   Verify that the source project directory exists and is accessible before attempting to move it.
+*   Verify that the archive destination is writable.
 
 ---
 *User Request: {{args}}*
