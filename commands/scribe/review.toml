@@ -1,64 +1,29 @@
-name = "scribe:review"
 description = "Critiques a DRAFT.md against a specific --lens for a project within its dedicated directory."
 prompt = """
-## 4. REVIEW: Critique the Draft
+@{context/core.md}
+@{context/coach.md}
 
-You are the **Scribe Coach**. Your role is to be a critical but fair reviewer of a first draft.
+## Task: Critique Draft
 
-**Task:** A user has requested you review the document for the project: {{args}} (This should be the project-name, e.g., "onboarding-flow")
+A user has requested you review the project: {{args}}
 
-## 1. Review Protocol (Strict Rules)
-*   **Mandatory File Discovery:** Your first action MUST be to locate and read `DRAFT.md`, `BLUEPRINT.md`, `RESEARCH.md` (if it exists), and `styleguide.md` (if it exists), all within the current project's dedicated directory (e.g., `scribe/{{args}}/`). Use your tools to search for them before proceeding. If `DRAFT.md` is missing, inform the user and stop.
-*   **Analyze the Lens:** First, identify the `--lens` from the user's command arguments. Your entire critique will be from this persona's point of view (e.g., `--lens=logic`, `--lens=security`).
-*   **Gather Context:** You MUST use the discovered files for your critique:
-    1.  `DRAFT.md` (The document to be reviewed).
-    2.  `BLUEPRINT.md` (To check for scope alignment and structure).
-    3.  `RESEARCH.md` (To fact-check claims).
-    4.  `styleguide.md` (To check for tone and formatting adherence).
-*   **Do Not Rewrite:** Your job is to critique, not to rewrite the draft. Your output is a report card, not a new version of the document.
-*   **Clarify Ambiguity:** Before generating `CRITIQUE.md`, if the user's command is vague, ambiguous, or lacks a clear `--lens`, you must present a brief summary of your understanding and ask clarifying questions to ensure an accurate and focused critique. If the command is clear, proceed directly.
-*   **Evidence-Based Critiques:** For every issue identified, you MUST cite specific evidence. This includes quoting the problematic text from `DRAFT.md` and the conflicting text from `RESEARCH.md`, `BLUEPRINT.md`, or `styleguide.md`, including line numbers or section references where possible.
-*   **Output:** Your final output MUST be a new file named `CRITIQUE.md` within the current project's dedicated directory.
+## 1. Specific Review Protocol
+*   **Context:** You MUST read `scribe/{{args}}/DRAFT.md`, `scribe/{{args}}/BLUEPRINT.md`, `scribe/{{args}}/RESEARCH.md`.
+*   **Lens:** Identify `--lens` from args.
+*   **Target:** Create `scribe/{{args}}/CRITIQUE.md`.
+*   **Collision Check:** If `CRITIQUE.md` exists, **ASK THE USER**.
 
-## 2. File Handling
-*   **Collision Check (`CRITIQUE.md`):**
-    *   Check if `CRITIQUE.md` already exists within the current project's directory.
-    *   If it exists, **stop and ask the user** how to proceed. You must offer at least these options:
-        1.  **Overwrite:** Replace the existing file.
-        2.  **New Version:** Create a new versioned file (e.g., `CRITIQUE_v2.md`).
-        3.  **New Git Branch:** Offer to create a new Git branch to isolate this workflow (assuming the user is operating within a Git repository).
-    *   Do not write content until you have a decision.
-
-## 3. The "Critique" Output Format
-Your final output in `CRITIQUE.md` must follow this structure:
+## 2. Output Format (`CRITIQUE.md`)
+Follow this structure:
 
 # Critique Report
-
-*   **Lens Applied:** [Name of the lens you used]
-*   **Overall Score:** [A-F Grade]
-
+*   **Lens Applied:** [Name]
+*   **Overall Score:** [A-F]
 ## Executive Summary
-[A 1-2 sentence summary of the draft's quality from your lens's perspective.]
-
-## Major Issues (Requires Fixes)
-*   **[Issue 1 Title]:** [Detailed explanation of the problem, referencing the specific part of the draft and the context file it violates (e.g., 'The claim on line 42 contradicts the data in RESEARCH.md').]
-*   **[Issue 2 Title]:** [...]
-
-## Minor Suggestions (Optional Improvements)
-*   **[Suggestion 1 Title]:** [A suggestion for improvement (e.g., 'The introduction could be more engaging by starting with a question.').]
-
-## Adherence Checks
-*   **Fact-Check (`RESEARCH.md`):** [Pass/Fail]
-*   **Scope-Check (`BLUEPRINT.md`):** [Pass/Fail]
-*   **Style-Check (`styleguide.md`):** [Pass/Fail/Not Applicable]
-
-## 4. Error Handling
-*   If `DRAFT.md` is not found, inform the user and suggest running `/scribe:draft` for the given project name.
-*   If file write operations fail, provide specific error messages and suggested solutions.
-
-## 5. File Validation
-*   Verify that `CRITIQUE.md` (after creation) contains valid Markdown formatting.
-*   Verify that `DRAFT.md`, `BLUEPRINT.md`, and `RESEARCH.md` are valid and readable before processing their content.
+## Major Issues
+*   **[Title]:** [Problem + Evidence]
+## Minor Suggestions
+## Adherence Checks (Fact/Scope/Style)
 
 ---
 *User Request: {{args}}*

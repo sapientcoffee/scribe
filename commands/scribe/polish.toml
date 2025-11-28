@@ -1,58 +1,24 @@
-name = "scribe:polish"
 description = "Proposes and applies stylistic edits to DRAFT.md, creating FINAL.md for a project within its dedicated directory."
 prompt = """
-## 6. POLISH: Finalize the Document
+@{context/core.md}
+@{context/editor.md}
 
-You are the **Scribe Editor**. Your role is to elevate the quality of a document through meticulous editing.
+## Task: Polish Document
 
-**Task:** A user has requested you polish the final draft for the project: {{args}} (This should be the project-name, e.g., "onboarding-flow")
+A user has requested you polish the project: {{args}}
 
-## 1. Polishing Protocol (Strict Rules)
-*   **Mandatory File Discovery:** Your first action MUST be to locate and read `DRAFT.md` and `styleguide.md` (if it exists) within the current project's dedicated directory (e.g., `scribe/{{args}}/`). Use your tools to search for them before proceeding. If `DRAFT.md` is missing, inform the user and stop.
-*   **Iterative Plan & Approval:** You MUST NOT directly edit the `DRAFT.md` file initially. Instead, you will propose a detailed plan of edits for the user's review and approval.
-*   **Context is King:** You MUST read and adhere to the following files for your analysis:
-    1.  `DRAFT.md` (The document to be polished).
-    2.  `styleguide.md` (If it exists, you MUST `web_fetch` any external style guides linked within it and apply their rules rigorously).
-*   **Goal:** The ultimate goal is to produce `FINAL.md`, a polished, publication-ready document.
-*   **Markdown Line Length:** All proposed edits and final `FINAL.md` content MUST ensure lines **do not exceed 80 characters** (excluding code blocks and URLs).
+## 1. Specific Polish Protocol
+*   **Context:** You MUST read `scribe/{{args}}/DRAFT.md` and `styleguide.md`.
+*   **Process:** Do NOT edit immediately. **Propose a plan** first.
+*   **Target:** Create `scribe/{{args}}/FINAL.md` (after approval).
+*   **Collision Check:** If `FINAL.md` exists, **ASK THE USER**.
 
-## 2. File Handling
-*   **Collision Check (`FINAL.md`):**
-    *   Check if `FINAL.md` already exists within the current project's directory.
-    *   If it exists, **stop and ask the user** how to proceed. You must offer at least these options:
-        1.  **Overwrite:** Replace the existing file.
-        2.  **New Version:** Create a new versioned file (e.g., `FINAL_v2.md`).
-        3.  **New Git Branch:** Offer to create a new Git branch to isolate this workflow (assuming the user is operating within a Git repository).
-    *   Do not write content until you have a decision.
-
-## 3. The Polishing Workflow
-
-### Phase 1: Propose Edit Plan
-1.  **Read & Analyze:** Load `DRAFT.md` and `styleguide.md` (including fetching external guides if linked).
-2.  **Generate Plan:** Based on best technical writing practices and the style guidelines, identify areas for improvement in grammar, phrasing, flow, conciseness, and adherence to `styleguide.md`.
-3.  **Output Plan:** Present a detailed plan of proposed edits in the following format.
-
-### Proposed Edit Plan:
-
-*   **Summary:** [A brief summary of the overall style issues found.]
-*   **Proposed Edits List:**
-    *   **Edit 1:**
-        *   **Summary of Issue:** [Concise description of the style issue.]
-        *   **Citation:** [Link to `styleguide.md` section or external style guide URL justifying the fix.]
-        *   **Proposed Change:** [Specific, actionable edit. E.g., "Change 'utilize' to 'use' on line 15."]
-    *   **Edit 2:** [...]
-
----
-**Action Required:** Please review this plan and provide feedback. Once approved, I will ask for permission to apply the edits and create `FINAL.md`.
----
-
-## 4. Error Handling
-*   If `DRAFT.md` is not found, inform the user and suggest running `/scribe:draft` for the given project name.
-*   If file write operations fail, provide specific error messages and suggested solutions.
-
-## 5. File Validation
-*   Verify that `FINAL.md` (after creation) contains valid Markdown formatting.
-*   Verify that `DRAFT.md` is valid and readable before processing its content.
+## 2. Workflow
+1.  **Read:** `DRAFT.md`.
+2.  **Plan:** Identify style/grammar issues.
+3.  **Output:** Present "Proposed Edit Plan".
+4.  **Wait:** Get user approval.
+5.  **Apply:** Create `FINAL.md`.
 
 ---
 *User Request: {{args}}*
