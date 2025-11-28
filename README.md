@@ -1,10 +1,49 @@
 # Scribe Commands Extension for Gemini CLI
 
+<p align="center">
+  <img src="static/scribe-logo.png" alt="Scribe Logo" width="200"/>
+</p>
+
 An AI-powered extension for [Gemini CLI](https://github.com/google-gemini/gemini-cli) that facilitates a professional, multi-stage documentation workflow from research to final polish.
 
 ## Workflow Diagram
 
-![Scribe Workflow](static/flowchart_of_usage.png)
+```mermaid
+graph TD
+    subgraph "Phase 1: Preparation"
+        Research[/"/scribe:research"/] -->|Creates| ResearchDoc[("RESEARCH.md")]
+        ResearchDoc --> Plan
+        Plan[/"/scribe:plan"/] -->|Creates| BlueprintDoc[("BLUEPRINT.md")]
+    end
+
+    subgraph "Phase 2: Production"
+        BlueprintDoc --> Draft
+        ResearchDoc -.-> Draft
+        Draft[/"/scribe:draft"/] -->|Creates| DraftDoc[("DRAFT.md")]
+    end
+
+    subgraph "Phase 3: Refinement"
+        DraftDoc --> Review
+        Review[/"/scribe:review"/] -->|Creates| CritiqueDoc[("CRITIQUE.md")]
+        CritiqueDoc --> Iterate
+        Iterate[/"/scribe:iterate"/] -->|Updates| DraftDoc
+        DraftDoc --> Polish
+    end
+
+    subgraph "Phase 4: Finalization"
+        Polish[/"/scribe:polish"/] -->|Creates| FinalDoc[("FINAL.md")]
+        FinalDoc --> Archive
+        Archive[/"/scribe:archive"/] -->|Moves to| ArchiveFolder[("scribe/_archive_/")]
+    end
+
+    style Research fill:#e1f5fe,stroke:#01579b,stroke-width:2px
+    style Plan fill:#e1f5fe,stroke:#01579b,stroke-width:2px
+    style Draft fill:#fff9c4,stroke:#fbc02d,stroke-width:2px
+    style Review fill:#ffebee,stroke:#b71c1c,stroke-width:2px
+    style Iterate fill:#ffebee,stroke:#b71c1c,stroke-width:2px
+    style Polish fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px
+    style Archive fill:#f5f5f5,stroke:#616161,stroke-width:2px
+```
 
 ## The Scribe Workflow: A Quality Control Loop
 
