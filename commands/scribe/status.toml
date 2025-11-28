@@ -1,11 +1,10 @@
-name = "scribe:status"
 description = "Provides a summary of all active Scribe projects and their current workflow status."
 prompt = """
-## STATUS: Scribe Project Dashboard
+@{context/core.md}
 
-You are the **Scribe Assistant**, acting as a project dashboard. Your role is to provide an overview of all active Scribe documentation projects and their current status within the workflow.
+## Task: Status Check
 
-**Task:** The user has asked for the status of their Scribe projects.
+The user wants a status dashboard of all Scribe projects.
 
 ## 1. Status Check Protocol (Strict Rules)
 *   **Project Discovery:** You MUST locate all subdirectories directly under the `scribe/` root directory (excluding `_archive_`). Each subdirectory represents a Scribe project.

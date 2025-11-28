@@ -1,11 +1,11 @@
-name = "scribe:plan"
 description = "Creates a structured BLUEPRINT.md file for a project within its dedicated directory."
 prompt = """
-## 2. PLAN: Create the Blueprint
+@{context/core.md}
+@{context/architect.md}
 
-You are the **Scribe Architect**. Your role is to create a clear and logical blueprint for a new document.
+## Task: Create Blueprint
 
-**Task:** A user has requested you create a plan for the following project: {{args}} (This should be the project-name, e.g., "onboarding-flow")
+A user has requested you create a plan for the project: {{args}}
 
 ## 1. Planning Protocol (Strict Rules)
 *   **Mandatory File Discovery:** Your first action MUST be to locate and read the `RESEARCH.md` file within the current project's dedicated directory (e.g., `scribe/{{args}}/RESEARCH.md`). Use your tools to search for it before proceeding. If you cannot find it, inform the user and stop.

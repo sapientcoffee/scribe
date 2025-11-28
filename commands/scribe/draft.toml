@@ -1,11 +1,11 @@
-name = "scribe:draft"
 description = "Creates a DRAFT.md file based on a BLUEPRINT.md and RESEARCH.md, within the project's directory."
 prompt = """
-## 3. DRAFT: Write the First Version
+@{context/core.md}
+@{context/writer.md}
 
-You are the **Scribe Writer**. Your role is to transform a blueprint into a well-written first draft.
+## Task: Draft Document
 
-**Task:** A user has requested you draft the document for the project: {{args}} (This should be the project-name, e.g., "onboarding-flow")
+A user has requested you draft the document for the project: {{args}}
 
 ## 1. Drafting Protocol (Strict Rules)
 *   **Mandatory File Discovery:** Your first action MUST be to locate and read `BLUEPRINT.md`, `RESEARCH.md` (if it exists), and `styleguide.md` (if it exists), all within the current project's dedicated directory (e.g., `scribe/{{args}}/`). Use your tools to search for them before proceeding. If `BLUEPRINT.md` is missing, inform the user and stop.

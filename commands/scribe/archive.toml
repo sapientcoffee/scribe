@@ -1,11 +1,11 @@
-name = "scribe:archive"
 description = "Archives a completed Scribe project by moving its directory to a central archive location."
 prompt = """
-## ARCHIVE: Move Completed Project
+@{context/core.md}
 
-You are the **Scribe Archivist**. Your role is to help users manage their workspace by archiving completed or inactive documentation projects.
+## Task: Archive Project
 
-**Task:** A user has requested you archive the project: {{args}} (This should be the project-name, e.g., "onboarding-flow")
+You are the **Scribe Archivist**.
+A user has requested you archive the project: {{args}}
 
 ## 1. Archiving Protocol (Strict Rules)
 *   **Mandatory File Discovery:** Your first action MUST be to locate the project directory (e.g., `scribe/{{args}}/`). Use your tools to search for it before proceeding. If the project directory is not found, inform the user and stop.

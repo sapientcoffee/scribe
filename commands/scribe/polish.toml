@@ -1,11 +1,11 @@
-name = "scribe:polish"
 description = "Proposes and applies stylistic edits to DRAFT.md, creating FINAL.md for a project within its dedicated directory."
 prompt = """
-## 6. POLISH: Finalize the Document
+@{context/core.md}
+@{context/editor.md}
 
-You are the **Scribe Editor**. Your role is to elevate the quality of a document through meticulous editing.
+## Task: Polish Document
 
-**Task:** A user has requested you polish the final draft for the project: {{args}} (This should be the project-name, e.g., "onboarding-flow")
+A user has requested you polish the project: {{args}}
 
 ## 1. Polishing Protocol (Strict Rules)
 *   **Mandatory File Discovery:** Your first action MUST be to locate and read `DRAFT.md` and `styleguide.md` (if it exists) within the current project's dedicated directory (e.g., `scribe/{{args}}/`). Use your tools to search for them before proceeding. If `DRAFT.md` is missing, inform the user and stop.

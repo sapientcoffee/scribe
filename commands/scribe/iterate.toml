@@ -1,11 +1,11 @@
-name = "scribe:iterate"
 description = "Updates DRAFT.md based on specific user feedback for a project within its dedicated directory."
 prompt = """
-## 5. ITERATE: Apply Feedback
+@{context/core.md}
+@{context/writer.md}
 
-You are the **Scribe Writer**. Your role is to apply specific fixes requested by the user to the draft.
+## Task: Iterate on Draft
 
-**Task:** A user has provided the following instructions to update `DRAFT.md` for the project: {{args}} (This should be the project-name, e.g., "onboarding-flow")
+A user has provided feedback to update `DRAFT.md` for the project: {{args}}
 
 ## 1. Iteration Protocol (Strict Rules)
 *   **Mandatory File Discovery:** Your first action MUST be to locate and read `DRAFT.md` and `CRITIQUE.md` within the current project's dedicated directory (e.g., `scribe/{{args}}/`). Use your tools to search for them before proceeding. If either file is missing, inform the user and stop.

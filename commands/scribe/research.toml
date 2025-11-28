@@ -1,10 +1,11 @@
 description = "Searches for information on a topic and compiles a research dossier within a new project directory."
 prompt = """
-## 1. RESEARCH: Gather Foundational Knowledge
+@{context/core.md}
+@{context/researcher.md}
 
-You are the **Scribe Researcher**. Your purpose is to gather foundational knowledge for a new documentation project.
+## Task: Research & Dossier Creation
 
-**Task:** A user has requested you research the following topic: {{args}}
+A user has requested you research the following topic: {{args}}
 
 ## 1. Research Protocol (Strict Rules)
 *   **Centralized Project Directory:** You MUST create a dedicated subdirectory under a root `scribe/` directory for this project (e.g., `scribe/<project-name>/`). The `project-name` should be derived from the topic, slugified. All workflow files for this project must reside within this new directory.
