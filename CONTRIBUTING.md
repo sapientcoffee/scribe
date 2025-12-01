@@ -43,6 +43,7 @@ Scribe uses a **Modular JIT (Just-In-Time) Context** architecture.
 2.  **Modify Prompts:** Edit the `.toml` files in `commands/scribe/`.
     *   *Tip:* Keep the `prompt` strings clean and readable.
     *   *Constraint:* Do not introduce external file dependencies (e.g., `@{context/file.md}`) unless necessary, as this breaks portability.
+    *   **Important:** Core principles and persona definitions are duplicated across multiple `.toml` files for portability. If you modify these shared sections, you must update them in all relevant files to maintain consistency. Please see `docs/adr/0001-modular-jit-context.md` for more details.
 3.  **Validate:** Run the validation tool to check for syntax errors.
     ```bash
     gemini extensions validate .
