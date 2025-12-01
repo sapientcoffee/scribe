@@ -58,6 +58,7 @@ Scribe uses a **Modular JIT (Just-In-Time) Context** architecture.
     *   `fix: correct typo in draft prompt`
     *   `docs: update workflow diagram`
 *   **Documentation:** If you change a workflow, update the Mermaid diagram in `README.md`.
+*   **Content Style:** Be aware of the `styleguide.md` file. If present in a project, its rules on tone, voice, and formatting are strictly enforced by Scribe during content generation.
 
 ## 📬 Submitting a Pull Request
 1.  Push your branch to GitHub.
