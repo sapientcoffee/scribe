@@ -6,6 +6,8 @@
 
 An AI-powered extension for [Gemini CLI](https://github.com/google-gemini/gemini-cli) that facilitates a professional, multi-stage documentation workflow from research to final polish.
 
+> **Read the deep-dive blog post:** [Building Scribe: Spec-Driven Documentation in the Terminal](https://sapient.coffee/posts/2025/scribe-gemini-cli-extension/)
+
 ## Workflow Diagram
 
 ```mermaid
