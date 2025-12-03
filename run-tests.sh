@@ -51,4 +51,13 @@ $YAMLLINT_CMD .
 echo "✅ YAML check passed."
 
 echo "--------------------------------------------------"
+echo "📊 Running Token Audit..."
+if [ ! -d "node_modules" ]; then
+    echo "📦 Installing dependencies for token audit..."
+    npm install --no-audit --no-fund --quiet
+fi
+node scripts/audit-tokens.js
+echo "✅ Token audit passed."
+
+echo "--------------------------------------------------"
 echo "🎉 All checks passed successfully!"

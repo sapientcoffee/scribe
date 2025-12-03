@@ -44,6 +44,24 @@ jobs:
       - name: 🏗️ Lint YAML
         run: yamllint .
 
+  token-audit:
+    name: 📊 Token Audit
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: 📦 Install Dependencies
+        run: npm install
+
+      - name: 🧮 Run Audit
+        run: node scripts/audit-tokens.js
+
   integration-test:
     name: 🔌 Extension Install Test
     runs-on: ubuntu-latest
