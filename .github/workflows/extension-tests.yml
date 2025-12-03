@@ -7,17 +7,32 @@ on:
     branches: [ main, master ]
 
 jobs:
-  validate-json:
-    name: Validate Manifest
+  validate-extension:
+    name: Validate and Install
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Validate gemini-extension.json
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Gemini CLI
+        run: npm install -g genkit-cli
+
+      - name: Validate Extension
+        run: gemini extensions validate .
+
+      - name: Test Installation
+        run: gemini extensions install .
+
+      - name: Verify Extension is Listed
         run: |
-          sudo apt-get install -y jq
-          jq . gemini-extension.json
+          gemini extensions list
+          # fail if scribe is not in the output
+          gemini extensions list | grep "scribe"
 
   lint-toml:
     name: Lint TOML Commands
