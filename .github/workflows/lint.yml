@@ -1,0 +1,33 @@
+name: Linting
+
+on:
+  pull_request:
+    branches: [ main, master ]
+  push:
+    branches: [ main, master ]
+
+jobs:
+  lint-files:
+    name: Lint JSON and Markdown
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Linters
+        run: |
+          npm install -g jsonlint markdownlint-cli
+
+      - name: Lint JSON files
+        run: |
+          # Find all .json files and run jsonlint on them
+          find . -type f -name "*.json" -not -path "*/node_modules/*" -not -path "*/.git/*" -print0 | xargs -0 -n 1 jsonlint -q
+
+      - name: Lint Markdown files
+        run: |
+          markdownlint "**/*.md" --ignore node_modules --ignore .git
