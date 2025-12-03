@@ -18,7 +18,9 @@ if (USE_API) {
     genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
     model = genAI.getGenerativeModel({ model: "gemini-3-pro-preview" });
 } else {
-    console.log("⚠️  No Gemini API Key found. Using 'js-tiktoken' (GPT-4) for static estimation.");
+    console.error("❌ FATAL: GEMINI_API_KEY is missing.");
+    console.error("   Token audit requires a valid API key to ensure accurate counts.");
+    process.exit(1);
 }
 
 // --- Helper Functions ---
