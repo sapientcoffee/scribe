@@ -117,10 +117,39 @@ From your command line:
 gemini extensions install https://github.com/sapientcoffee/scribe
 ```
 
-## Extension Validation
+## Extension Validation & Testing
 
-Validate the extension from the command line:
+We maintain high quality standards for this extension using automated linting and validation tests.
+
+```mermaid
+graph LR
+    Developer[Developer] -->|Run Locally| Script["./run-tests.sh"]
+    Developer -->|Push / PR| GitHub[GitHub Actions]
+
+    subgraph "Automated Checks"
+        Script --> Linting
+        GitHub --> Linting[Linter Checks<br/>(JSON, Markdown, TOML, YAML)]
+        GitHub --> Validation[Extension Validation<br/>(Install & List)]
+    end
+```
+
+### Running Tests Locally
+
+To ensure your changes are valid before pushing, you can run the local test script:
 
 ```bash
-gemini extensions validate
+./run-tests.sh
 ```
+
+This script checks for:
+1. **JSON Syntax:** Validates `gemini-extension.json` and other JSON files.
+2. **Markdown Style:** Checks all `.md` files against our style guide.
+3. **TOML Validity:** Ensures command definitions in `commands/` are valid TOML.
+4. **YAML Syntax:** Validates GitHub Actions workflow files.
+
+### CI/CD Pipeline
+
+Every Pull Request is automatically tested via GitHub Actions to verify:
+*   **Linting:** All file formats (JSON, Markdown, YAML, TOML) are syntactically correct.
+*   **Installation:** The extension installs successfully in a fresh environment.
+*   **Validation:** The extension manifest is valid according to the Gemini CLI schema.
