@@ -38,4 +38,4 @@ jobs:
 
       - name: Lint Markdown files
         run: |
-          markdownlint "**/*.md" --ignore node_modules --ignore .git
+          markdownlint "**/*.md" --config .markdownlint.json --ignore node_modules --ignore .git
