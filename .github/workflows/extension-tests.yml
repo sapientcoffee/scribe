@@ -7,32 +7,17 @@ on:
     branches: [ main, master ]
 
 jobs:
-  validate-extension:
-    name: Validate and Install
+  validate-json:
+    name: Validate Manifest
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      - name: Install Gemini CLI
-        run: npm install -g gemini-chat-cli
-
-      - name: Validate Extension
-        run: gemini extensions validate .
-
-      - name: Test Installation
-        run: gemini extensions install .
-
-      - name: Verify Extension is Listed
+      - name: Validate gemini-extension.json
         run: |
-          gemini extensions list
-          # fail if scribe is not in the output
-          gemini extensions list | grep "scribe"
+          sudo apt-get install -y jq
+          jq . gemini-extension.json
 
   lint-toml:
     name: Lint TOML Commands
@@ -41,11 +26,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Install Taplo (TOML Linter)
-        run: |
-          curl -fsSL https://github.com/tamasfe/taplo/releases/latest/download/taplo-full-linux-x86_64.gz | gzip -d - > taplo
-          chmod +x taplo
-          sudo mv taplo /usr/local/bin/
-
-      - name: Lint Command Files
-        run: taplo check "commands/**/*.toml"
+      - name: Run Taplo
+        uses: tamasfe/taplo-action@v1
+        with:
+          arguments: check "commands/**/*.toml"

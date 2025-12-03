@@ -21,7 +21,8 @@ jobs:
 
       - name: Install Linters
         run: |
-          npm install -g jsonlint markdownlint-cli yaml-lint
+          npm install -g jsonlint markdownlint-cli
+          pip install yamllint
 
       - name: Lint JSON files
         run: |
@@ -30,7 +31,7 @@ jobs:
 
       - name: Lint YAML files
         run: |
-          find . -type f \( -name "*.yaml" -o -name "*.yml" \) -not -path "*/node_modules/*" -not -path "*/.git/*" -print0 | xargs -0 -n 1 yaml-lint
+          yamllint .
 
       - name: Lint Markdown files
         run: |
