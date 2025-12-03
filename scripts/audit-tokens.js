@@ -1,93 +1,136 @@
 const fs = require('fs');
 const path = require('path');
 const { encodingForModel } = require('js-tiktoken');
+const { GoogleGenerativeAI } = require('@google/generative-ai');
 
-// Initialize tokenizer (using GPT-4 model as a standard proxy for modern LLM tokenization)
+// --- Configuration ---
+const MAX_TOKENS = 4500;
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+const USE_API = !!GEMINI_API_KEY;
+
+// --- Initialization ---
 const enc = encodingForModel("gpt-4");
+let genAI = null;
+let model = null;
 
-function countTokens(text) {
+if (USE_API) {
+    console.log("🔑 Gemini API Key found. Using API for precise token counting.");
+    genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
+    model = genAI.getGenerativeModel({ model: "gemini-3-pro-preview" });
+} else {
+    console.log("⚠️  No Gemini API Key found. Using 'js-tiktoken' (GPT-4) for static estimation.");
+}
+
+// --- Helper Functions ---
+
+async function countTokens(text) {
+    if (USE_API && model) {
+        try {
+            const result = await model.countTokens(text);
+            return result.totalTokens;
+        } catch (error) {
+            console.warn(`   ⚠️  API Error counting tokens: ${error.message}. Falling back to static.`);
+            return enc.encode(text).length;
+        }
+    }
     return enc.encode(text).length;
 }
 
-function getBaseContext() {
+function getFileContent(filePath) {
     try {
-        const content = fs.readFileSync('scribe.md', 'utf8');
-        return {
-            name: 'scribe.md (Base Context)',
-            tokens: countTokens(content),
-            content: content
-        };
+        return fs.readFileSync(filePath, 'utf8');
     } catch (e) {
-        return { name: 'scribe.md', tokens: 0, content: '' };
+        return "";
     }
 }
 
-function getCommands() {
+function extractPrompt(content) {
+    let promptContent = "";
+    // Try multi-line string first
+    const multiLineMatch = content.match(/prompt\s*=\s*"""([\s\S]*?)"""/);
+    if (multiLineMatch) {
+        promptContent = multiLineMatch[1];
+    } else {
+        // Try single line
+        const singleLineMatch = content.match(/prompt\s*=\s*"(.*?)"/);
+        if (singleLineMatch) {
+            promptContent = singleLineMatch[1];
+        }
+    }
+    return promptContent;
+}
+
+// --- Main Logic ---
+
+async function runAudit() {
+    console.log("\n📊 Token Usage Audit");
+    console.log("====================\n");
+
+    // 1. Base Context
+    const baseContent = getFileContent('scribe.md');
+    const baseTokens = await countTokens(baseContent);
+    
+    console.log(`🔹 Base Context (scribe.md): \x1b[33m${baseTokens}\x1b[0m tokens${USE_API ? ' (Exact)' : ' (Est.)'}\n`);
+
+    console.log("🔸 Commands (Base + Specific Prompt):");
+    console.log("-------------------------------------");
+
+    // 2. Commands
     const commandsDir = 'commands/scribe';
     const files = fs.readdirSync(commandsDir).filter(f => f.endsWith('.toml'));
     
-    return files.map(file => {
-        const content = fs.readFileSync(path.join(commandsDir, file), 'utf8');
-        // Extract prompt string from TOML (naive extraction for simplicity, or we could use a TOML parser)
-        // Looking for: prompt = """...""" or prompt = "..."
-        let promptContent = "";
+    const commandData = [];
+
+    for (const file of files) {
+        const content = getFileContent(path.join(commandsDir, file));
+        const prompt = extractPrompt(content);
         
-        // Try multi-line string first
-        const multiLineMatch = content.match(/prompt\s*=\s*"""([\s\S]*?)"""/);
-        if (multiLineMatch) {
-            promptContent = multiLineMatch[1];
-        } else {
-            // Try single line
-            const singleLineMatch = content.match(/prompt\s*=\s*"(.*?)"/);
-            if (singleLineMatch) {
-                promptContent = singleLineMatch[1];
-            }
-        }
+        // Note: In a real request, base + prompt are combined. 
+        // The API might count them slightly differently when concatenated vs summed, 
+        // but sum is a very close approximation for this audit.
+        const promptTokens = await countTokens(prompt);
+        const totalTokens = baseTokens + promptTokens;
 
-        return {
+        commandData.push({
             name: file,
-            tokens: countTokens(promptContent),
-            totalTokens: 0 // To be calculated
-        };
-    });
-}
-
-// Main Execution
-console.log("📊 Token Usage Audit");
-console.log("====================\n");
-
-const base = getBaseContext();
-console.log(`🔹 Base Context (${base.name}): \x1b[33m${base.tokens}\x1b[0m tokens\n`);
-
-console.log("🔸 Commands (Base + Specific Prompt):");
-console.log("-------------------------------------");
-
-// Threshold for warning/failure
-const MAX_TOKENS = 4000;
-let hasError = false;
-
-const commands = getCommands();
-// Sort by token count descending
-commands.sort((a, b) => b.tokens - a.tokens);
-
-commands.forEach(cmd => {
-    const total = base.tokens + cmd.tokens;
-    let statusColor = "\x1b[32m"; // Green
-    let statusIcon = "";
-
-    if (total > MAX_TOKENS) {
-        statusColor = "\x1b[31m"; // Red
-        statusIcon = " ⚠️  EXCESSIVE";
-        hasError = true;
+            promptTokens,
+            totalTokens
+        });
     }
 
-    console.log(`- ${cmd.name.padEnd(20)}: \x1b[36m${cmd.tokens.toString().padStart(4)}\x1b[0m (Prompt) + \x1b[33m${base.tokens}\x1b[0m (Base) = ${statusColor}${total.toString().padStart(5)}\x1b[0m Total${statusIcon}`);
-});
+    // Sort by total count descending
+    commandData.sort((a, b) => b.totalTokens - a.totalTokens);
 
-console.log("\n====================");
-console.log("NOTE: Estimates using GPT-4 tokenizer. Actual Gemini tokens may vary slightly.");
+    let hasError = false;
 
-if (hasError) {
-    console.error(`\n❌ FAILED: One or more commands exceed the ${MAX_TOKENS} token limit.`);
-    process.exit(1);
+    commandData.forEach(cmd => {
+        let statusColor = "\x1b[32m"; // Green
+        let statusIcon = "";
+
+        if (cmd.totalTokens > MAX_TOKENS) {
+            statusColor = "\x1b[31m"; // Red
+            statusIcon = " ⚠️  EXCESSIVE";
+            hasError = true;
+        }
+
+        console.log(`- ${cmd.name.padEnd(20)}: \x1b[36m${cmd.promptTokens.toString().padStart(4)}\x1b[0m (Prompt) + \x1b[33m${baseTokens}\x1b[0m (Base) = ${statusColor}${cmd.totalTokens.toString().padStart(5)}\x1b[0m Total${statusIcon}`);
+    });
+
+    console.log("\n====================");
+    if (USE_API) {
+        console.log("✅ Token counts are accurate (from Gemini API).");
+    } else {
+        console.log("NOTE: Estimates using GPT-4 tokenizer. Actual Gemini tokens may vary slightly.");
+    }
+
+    if (hasError) {
+        console.error(`\n❌ FAILED: One or more commands exceed the ${MAX_TOKENS} token limit.`);
+        process.exit(1);
+    }
 }
+
+// Run the async main function
+runAudit().catch(err => {
+    console.error("Fatal Error:", err);
+    process.exit(1);
+});
