@@ -1,0 +1,83 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Gemini CLI Extension Configuration",
+  "description": "Configuration file for a Gemini CLI extension.",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "The unique name of the extension. Should be lowercase or numbers and use dashes instead of underscores or spaces. Expected to match the extension directory name.",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+    },
+    "version": {
+      "type": "string",
+      "description": "The version of the extension.",
+      "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$"
+    },
+    "mcpServers": {
+      "type": "object",
+      "description": "A map of MCP servers to configure.",
+      "patternProperties": {
+        "^[a-zA-Z0-9_-]+$": {
+          "type": "object",
+          "properties": {
+            "command": {
+              "type": "string"
+            },
+            "args": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "env": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            }
+          },
+          "required": ["command"],
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": false
+    },
+    "contextFileName": {
+      "type": "string",
+      "description": "The name of the file that contains the context for the extension."
+    },
+    "excludeTools": {
+      "type": "array",
+      "description": "An array of tool names to exclude from the model.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "settings": {
+      "type": "array",
+      "description": "Settings that the user will be prompted to provide upon installation.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "envVar": {
+            "type": "string"
+          },
+          "sensitive": {
+            "type": "boolean",
+            "default": false
+          }
+        },
+        "required": ["name", "description", "envVar"]
+      }
+    }
+  },
+  "required": ["name", "version"],
+  "additionalProperties": false
+}

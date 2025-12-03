@@ -7,6 +7,11 @@ echo "🔍 Starting Local Linting Checks..."
 # No installation check needed, npx handles it.
 
 echo "--------------------------------------------------"
+echo "📋 Validating Extension Manifest Schema..."
+npx -y ajv-cli validate -s .github/schemas/extension-schema.json -d gemini-extension.json
+echo "✅ Manifest schema check passed."
+
+echo "--------------------------------------------------"
 echo "📄 Linting JSON..."
 # Use npx to run jsonlint
 find . -type f -name "*.json" -not -path "*/node_modules/*" -not -path "*/.git/*" -print0 | xargs -0 -n 1 npx -y jsonlint -q

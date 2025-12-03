@@ -34,6 +34,21 @@ jobs:
           # fail if scribe is not in the output
           gemini extensions list | grep "scribe"
 
+  validate-schema:
+    name: Validate Manifest Schema
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Validate gemini-extension.json
+        run: npx -y ajv-cli validate -s .github/schemas/extension-schema.json -d gemini-extension.json
+
   lint-toml:
     name: Lint TOML Commands
     runs-on: ubuntu-latest
