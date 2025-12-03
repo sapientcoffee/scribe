@@ -3,9 +3,11 @@
 A huge thank you to all the people who have contributed to Scribe!
 
 ## Maintainers
-*   **SapientCoffee** - [GitHub](https://github.com/sapientcoffee)
+
+* **SapientCoffee** - [GitHub](https://github.com/sapientcoffee)
 
 ## Contributors
+
 *(No additional contributors yet. Be the first!)*
 
 ---

@@ -27,7 +27,10 @@ jobs:
       - name: Lint JSON files
         run: |
           # Find all .json files and run jsonlint on them
-          find . -type f -name "*.json" -not -path "*/node_modules/*" -not -path "*/.git/*" -print0 | xargs -0 -n 1 jsonlint -q
+          find . -type f -name "*.json" \
+            -not -path "*/node_modules/*" \
+            -not -path "*/.git/*" \
+            -print0 | xargs -0 -n 1 jsonlint -q
 
       - name: Lint YAML files
         run: |

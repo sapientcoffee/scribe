@@ -51,35 +51,39 @@ graph TD
 
 Scribe operates on a structured, file-based workflow that mimics a professional editorial process. Each command performs a specific task and creates a specific file, allowing you to review and control every stage of document creation.
 
-1.  **Research (`/scribe:research`):** Gathers foundational knowledge and creates `RESEARCH.md`.
-2.  **Plan (`/scribe:plan`):** Creates a structured outline in `BLUEPRINT.md`.
-3.  **Draft (`/scribe:draft`):** Writes the first version of the document into `DRAFT.md`.
-4.  **Review (`/scribe:review`):** Critiques the draft from a specific perspective and creates `CRITIQUE.md`.
-5.  **Iterate (`/scribe:iterate`):** Applies your chosen fixes from the critique to the `DRAFT.md`.
-6.  **Polish (`/scribe:polish`):** Performs a final grammar and style check, creating `FINAL.md`.
+1. **Research (`/scribe:research`):** Gathers foundational knowledge and creates `RESEARCH.md`.
+2. **Plan (`/scribe:plan`):** Creates a structured outline in `BLUEPRINT.md`.
+3. **Draft (`/scribe:draft`):** Writes the first version of the document into `DRAFT.md`.
+4. **Review (`/scribe:review`):** Critiques the draft from a specific perspective and creates `CRITIQUE.md`.
+5. **Iterate (`/scribe:iterate`):** Applies your chosen fixes from the critique to the `DRAFT.md`.
+6. **Polish (`/scribe:polish`):** Performs a final grammar and style check, creating `FINAL.md`.
 
 ## Ideal Use Cases
 
 Scribe is designed for high-stakes, long-form content where structure and accuracy are paramount.
 
 ### 📖 Technical Books
-*   **Why:** Maintains consistency across hundreds of pages.
-*   **Strategy:** Treat each chapter as a separate Scribe project (e.g., `scribe/ch01-intro`). This keeps the context focused while a global `styleguide.md` ensures a unified voice across all chapters.
-*   **Key Feature:** Use `/scribe:review --lens=tech` to specifically audit code snippets and technical claims separate from prose editing.
+
+* **Why:** Maintains consistency across hundreds of pages.
+* **Strategy:** Treat each chapter as a separate Scribe project (e.g., `scribe/ch01-intro`). This keeps the context focused while a global `styleguide.md` ensures a unified voice across all chapters.
+* **Key Feature:** Use `/scribe:review --lens=tech` to specifically audit code snippets and technical claims separate from prose editing.
 
 ### 📄 Whitepapers & RFCs
-*   **Why:** Requires persuasive authority and bulletproof logic.
-*   **Strategy:** Use the **Research** phase to ground arguments in data, preventing hallucinations.
-*   **Key Feature:** Use `/scribe:review --lens=devil` to simulate a skeptical stakeholder, tearing down weak arguments before you publish.
+
+* **Why:** Requires persuasive authority and bulletproof logic.
+* **Strategy:** Use the **Research** phase to ground arguments in data, preventing hallucinations.
+* **Key Feature:** Use `/scribe:review --lens=devil` to simulate a skeptical stakeholder, tearing down weak arguments before you publish.
 
 ### 🎯 Product Requirement Documents (PRDs)
-*   **Why:** PRDs are contracts between teams; ambiguity causes bugs.
-*   **Strategy:** Use `/scribe:plan` to enforce standard sections (Non-Goals, Success Metrics) that are often skipped.
-*   **Key Feature:** Use `/scribe:review --lens=devil` to hunt for edge cases and vague requirements before engineering sees the doc.
+
+* **Why:** PRDs are contracts between teams; ambiguity causes bugs.
+* **Strategy:** Use `/scribe:plan` to enforce standard sections (Non-Goals, Success Metrics) that are often skipped.
+* **Key Feature:** Use `/scribe:review --lens=devil` to hunt for edge cases and vague requirements before engineering sees the doc.
 
 ### 📝 Complex Engineering Documentation
-*   **Why:** "Chatting" a complex doc into existence often leads to structural mess.
-*   **Strategy:** The **Plan** phase (`BLUEPRINT.md`) forces you to agree on the document's architecture before a single sentence is written.
+
+* **Why:** "Chatting" a complex doc into existence often leads to structural mess.
+* **Strategy:** The **Plan** phase (`BLUEPRINT.md`) forces you to agree on the document's architecture before a single sentence is written.
 
 ## Available Commands
 
