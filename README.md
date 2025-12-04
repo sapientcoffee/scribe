@@ -123,7 +123,7 @@ We maintain high quality standards for this extension using automated linting an
 
 ```mermaid
 graph LR
-    Developer[Developer] -->|Run Locally| Script["./run-tests.sh"]
+    Developer[Developer] -->|Run Locally| Script["./scripts/run-tests.sh"]
     Developer -->|Push / PR| GitHub[GitHub Actions]
 
     subgraph "Automated Checks"
@@ -140,7 +140,7 @@ graph LR
 To ensure your changes are valid before pushing, you can run the local test script:
 
 ```bash
-./run-tests.sh
+./scripts/run-tests.sh
 ```
 
 This script checks for:
