@@ -1,6 +1,9 @@
 #!/bin/bash
 set -e
 
+# Ensure we are running from the project root
+cd "$(dirname "$0")/.."
+
 echo "🔍 Starting Local Linting Checks..."
 
 # --- NPM Tools via NPX ---
