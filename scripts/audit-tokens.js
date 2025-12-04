@@ -25,17 +25,19 @@ if (USE_API) {
 
 // --- Helper Functions ---
 
-async function countTokens(text) {
-    if (USE_API && model) {
-        try {
-            const result = await model.countTokens(text);
-            return result.totalTokens;
-        } catch (error) {
-            console.warn(`   ⚠️  API Error counting tokens: ${error.message}. Falling back to static.`);
-            return enc.encode(text).length;
-        }
-    }
+function getStaticCount(text) {
     return enc.encode(text).length;
+}
+
+async function getApiCount(text) {
+    if (!model) return null;
+    try {
+        const result = await model.countTokens(text);
+        return result.totalTokens;
+    } catch (error) {
+        console.warn(`   ⚠️  API Error counting tokens: ${error.message}`);
+        return null;
+    }
 }
 
 function getFileContent(filePath) {
@@ -70,9 +72,15 @@ async function runAudit() {
 
     // 1. Base Context
     const baseContent = getFileContent('scribe.md');
-    const baseTokens = await countTokens(baseContent);
+    const baseStatic = getStaticCount(baseContent);
+    const baseApi = await getApiCount(baseContent);
     
-    console.log(`🔹 Base Context (scribe.md): \x1b[33m${baseTokens}\x1b[0m tokens${USE_API ? ' (Exact)' : ' (Est.)'}\n`);
+    // Use API count if available, otherwise fallback (though script exits if no key)
+    const baseUsed = baseApi !== null ? baseApi : baseStatic;
+    
+    console.log(`🔹 Base Context (scribe.md):`);
+    console.log(`   API: \x1b[33m${baseApi !== null ? baseApi : 'N/A'}\x1b[0m`);
+    console.log(`   Est: \x1b[36m${baseStatic}\x1b[0m\n`);
 
     console.log("🔸 Commands (Base + Specific Prompt):");
     console.log("-------------------------------------");
@@ -87,21 +95,25 @@ async function runAudit() {
         const content = getFileContent(path.join(commandsDir, file));
         const prompt = extractPrompt(content);
         
-        // Note: In a real request, base + prompt are combined. 
-        // The API might count them slightly differently when concatenated vs summed, 
-        // but sum is a very close approximation for this audit.
-        const promptTokens = await countTokens(prompt);
-        const totalTokens = baseTokens + promptTokens;
+        const promptStatic = getStaticCount(prompt);
+        const promptApi = await getApiCount(prompt);
+        
+        const totalStatic = baseStatic + promptStatic;
+        const totalApi = (baseApi !== null && promptApi !== null) ? (baseApi + promptApi) : null;
+
+        // Determining the "Official" total for pass/fail
+        const officialTotal = totalApi !== null ? totalApi : totalStatic;
 
         commandData.push({
             name: file,
-            promptTokens,
-            totalTokens
+            totalApi,
+            totalStatic,
+            officialTotal
         });
     }
 
-    // Sort by total count descending
-    commandData.sort((a, b) => b.totalTokens - a.totalTokens);
+    // Sort by official total count descending
+    commandData.sort((a, b) => b.officialTotal - a.officialTotal);
 
     let hasError = false;
 
@@ -109,21 +121,20 @@ async function runAudit() {
         let statusColor = "\x1b[32m"; // Green
         let statusIcon = "";
 
-        if (cmd.totalTokens > MAX_TOKENS) {
+        if (cmd.officialTotal > MAX_TOKENS) {
             statusColor = "\x1b[31m"; // Red
             statusIcon = " ⚠️  EXCESSIVE";
             hasError = true;
         }
 
-        console.log(`- ${cmd.name.padEnd(20)}: \x1b[36m${cmd.promptTokens.toString().padStart(4)}\x1b[0m (Prompt) + \x1b[33m${baseTokens}\x1b[0m (Base) = ${statusColor}${cmd.totalTokens.toString().padStart(5)}\x1b[0m Total${statusIcon}`);
+        const apiStr = cmd.totalApi !== null ? cmd.totalApi.toString().padStart(5) : "  N/A";
+        const estStr = cmd.totalStatic.toString().padStart(5);
+
+        console.log(`- ${cmd.name.padEnd(20)}: API: ${statusColor}${apiStr}\x1b[0m | Est: \x1b[36m${estStr}\x1b[0m${statusIcon}`);
     });
 
     console.log("\n====================");
-    if (USE_API) {
-        console.log("✅ Token counts are accurate (from Gemini API).");
-    } else {
-        console.log("NOTE: Estimates using GPT-4 tokenizer. Actual Gemini tokens may vary slightly.");
-    }
+    console.log("Legend: API = Gemini 3 Pro (Exact) | Est = GPT-4 Tokenizer (Approximate)");
 
     if (hasError) {
         console.error(`\n❌ FAILED: One or more commands exceed the ${MAX_TOKENS} token limit.`);
