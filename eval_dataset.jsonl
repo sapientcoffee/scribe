@@ -1,0 +1,2 @@
+{"instruction": "Create a structured blueprint for a technical guide about Git.", "context": "The user is a beginner. The guide should cover init, add, commit, and push.", "reference": "# Blueprint: Git Guide\n## Objective\nTeach beginners Git basics.\n## Sections\n1. Setup\n2. Workflow"}
+{"instruction": "Create a structured blueprint for a guide on making coffee.", "context": "Target audience is home baristas. Cover grinding, brewing, and water temp.", "reference": "# Blueprint: Coffee Guide\n## Objective\nMaster home brewing.\n## Sections\n1. Beans\n2. Brewing"}
