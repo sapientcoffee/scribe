@@ -129,9 +129,9 @@ graph LR
     subgraph "Automated Checks"
         Script --> Linting
         Script --> Audit[Token Audit]
-        GitHub --> Linting[Linter Checks<br/>(JSON, Markdown, TOML, YAML)]
+        GitHub --> Linting["Linter Checks<br/>(JSON, Markdown, TOML, YAML)"]
         GitHub --> Audit
-        GitHub --> Validation[Extension Validation<br/>(Install & List)]
+        GitHub --> Validation["Extension Validation<br/>(Install & List)"]
     end
 ```
 
