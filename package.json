@@ -1,0 +1,28 @@
+{
+  "name": "scribe",
+  "version": "1.0.0",
+  "description": "<p align=\"center\">   <img src=\"static/scribe-logo.png\" alt=\"Scribe Logo\" width=\"200\"/> </p>",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sapientcoffee/scribe.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/sapientcoffee/scribe/issues"
+  },
+  "homepage": "https://github.com/sapientcoffee/scribe#readme",
+  "dependencies": {
+    "@google/generative-ai": "^0.24.1",
+    "js-tiktoken": "^1.0.21"
+  }
+}

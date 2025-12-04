@@ -6,6 +6,8 @@
 
 An AI-powered extension for [Gemini CLI](https://github.com/google-gemini/gemini-cli) that facilitates a professional, multi-stage documentation workflow from research to final polish.
 
+> **Read the deep-dive blog post:** [Building Scribe: Spec-Driven Documentation in the Terminal](https://sapient.coffee/posts/2025/scribe-gemini-cli-extension/)
+
 ## Workflow Diagram
 
 ```mermaid
@@ -49,35 +51,39 @@ graph TD
 
 Scribe operates on a structured, file-based workflow that mimics a professional editorial process. Each command performs a specific task and creates a specific file, allowing you to review and control every stage of document creation.
 
-1.  **Research (`/scribe:research`):** Gathers foundational knowledge and creates `RESEARCH.md`.
-2.  **Plan (`/scribe:plan`):** Creates a structured outline in `BLUEPRINT.md`.
-3.  **Draft (`/scribe:draft`):** Writes the first version of the document into `DRAFT.md`.
-4.  **Review (`/scribe:review`):** Critiques the draft from a specific perspective and creates `CRITIQUE.md`.
-5.  **Iterate (`/scribe:iterate`):** Applies your chosen fixes from the critique to the `DRAFT.md`.
-6.  **Polish (`/scribe:polish`):** Performs a final grammar and style check, creating `FINAL.md`.
+1. **Research (`/scribe:research`):** Gathers foundational knowledge and creates `RESEARCH.md`.
+2. **Plan (`/scribe:plan`):** Creates a structured outline in `BLUEPRINT.md`.
+3. **Draft (`/scribe:draft`):** Writes the first version of the document into `DRAFT.md`.
+4. **Review (`/scribe:review`):** Critiques the draft from a specific perspective and creates `CRITIQUE.md`.
+5. **Iterate (`/scribe:iterate`):** Applies your chosen fixes from the critique to the `DRAFT.md`.
+6. **Polish (`/scribe:polish`):** Performs a final grammar and style check, creating `FINAL.md`.
 
 ## Ideal Use Cases
 
 Scribe is designed for high-stakes, long-form content where structure and accuracy are paramount.
 
 ### 📖 Technical Books
-*   **Why:** Maintains consistency across hundreds of pages.
-*   **Strategy:** Treat each chapter as a separate Scribe project (e.g., `scribe/ch01-intro`). This keeps the context focused while a global `styleguide.md` ensures a unified voice across all chapters.
-*   **Key Feature:** Use `/scribe:review --lens=tech` to specifically audit code snippets and technical claims separate from prose editing.
+
+* **Why:** Maintains consistency across hundreds of pages.
+* **Strategy:** Treat each chapter as a separate Scribe project (e.g., `scribe/ch01-intro`). This keeps the context focused while a global `styleguide.md` ensures a unified voice across all chapters.
+* **Key Feature:** Use `/scribe:review --lens=tech` to specifically audit code snippets and technical claims separate from prose editing.
 
 ### 📄 Whitepapers & RFCs
-*   **Why:** Requires persuasive authority and bulletproof logic.
-*   **Strategy:** Use the **Research** phase to ground arguments in data, preventing hallucinations.
-*   **Key Feature:** Use `/scribe:review --lens=devil` to simulate a skeptical stakeholder, tearing down weak arguments before you publish.
+
+* **Why:** Requires persuasive authority and bulletproof logic.
+* **Strategy:** Use the **Research** phase to ground arguments in data, preventing hallucinations.
+* **Key Feature:** Use `/scribe:review --lens=devil` to simulate a skeptical stakeholder, tearing down weak arguments before you publish.
 
 ### 🎯 Product Requirement Documents (PRDs)
-*   **Why:** PRDs are contracts between teams; ambiguity causes bugs.
-*   **Strategy:** Use `/scribe:plan` to enforce standard sections (Non-Goals, Success Metrics) that are often skipped.
-*   **Key Feature:** Use `/scribe:review --lens=devil` to hunt for edge cases and vague requirements before engineering sees the doc.
+
+* **Why:** PRDs are contracts between teams; ambiguity causes bugs.
+* **Strategy:** Use `/scribe:plan` to enforce standard sections (Non-Goals, Success Metrics) that are often skipped.
+* **Key Feature:** Use `/scribe:review --lens=devil` to hunt for edge cases and vague requirements before engineering sees the doc.
 
 ### 📝 Complex Engineering Documentation
-*   **Why:** "Chatting" a complex doc into existence often leads to structural mess.
-*   **Strategy:** The **Plan** phase (`BLUEPRINT.md`) forces you to agree on the document's architecture before a single sentence is written.
+
+* **Why:** "Chatting" a complex doc into existence often leads to structural mess.
+* **Strategy:** The **Plan** phase (`BLUEPRINT.md`) forces you to agree on the document's architecture before a single sentence is written.
 
 ## Available Commands
 
@@ -111,10 +117,53 @@ From your command line:
 gemini extensions install https://github.com/sapientcoffee/scribe
 ```
 
-## Extension Validation
+## Extension Validation & Testing
 
-Validate the extension from the command line:
+We maintain high quality standards for this extension using automated linting and validation tests.
+
+```mermaid
+graph LR
+    Developer[Developer] -->|Run Locally| Script["./run-tests.sh"]
+    Developer -->|Push / PR| GitHub[GitHub Actions]
+
+    subgraph "Automated Checks"
+        Script --> Linting
+        Script --> Audit[Token Audit]
+        GitHub --> Linting[Linter Checks<br/>(JSON, Markdown, TOML, YAML)]
+        GitHub --> Audit
+        GitHub --> Validation[Extension Validation<br/>(Install & List)]
+    end
+```
+
+### Running Tests Locally
+
+To ensure your changes are valid before pushing, you can run the local test script:
 
 ```bash
-gemini extensions validate
+./run-tests.sh
 ```
+
+This script checks for:
+1. **JSON Syntax:** Validates `gemini-extension.json` and other JSON files.
+2. **Markdown Style:** Checks all `.md` files against our style guide.
+3. **TOML Validity:** Ensures command definitions in `commands/` are valid TOML.
+4. **YAML Syntax:** Validates GitHub Actions workflow files.
+
+### CI/CD Pipeline
+
+Every Pull Request is automatically tested via GitHub Actions to verify:
+*   **Linting:** All file formats (JSON, Markdown, YAML, TOML) are syntactically correct.
+*   **Installation:** The extension installs successfully in a fresh environment.
+*   **Validation:** The extension manifest is valid according to the Gemini CLI schema.
+*   **Token Audit:** Estimates token usage for each command to ensure prompts remain efficient (< 4500 tokens).
+
+### CI Configuration
+
+To enable the Token Audit in your fork or repository, you must provide a Gemini API Key.
+
+1.  Get an API Key from [Google AI Studio](https://aistudio.google.com/).
+2.  Go to your GitHub Repository **Settings** > **Secrets and variables** > **Actions**.
+3.  Create a **New repository secret** named `GEMINI_API_KEY`.
+4.  Paste your API key value.
+
+Without this key, the CI workflow will fail.

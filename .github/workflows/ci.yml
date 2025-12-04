@@ -1,0 +1,91 @@
+name: 🛡️ Quality Gate
+
+on:
+  pull_request:
+    branches: [ main, master ]
+  push:
+    branches: [ main, master ]
+
+jobs:
+  static-checks:
+    name: 🔍 Static Analysis
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: 🛠️ Install Tools
+        run: |
+          npm install -g jsonlint markdownlint-cli @taplo/cli ajv-cli
+          pip install yamllint
+
+      - name: 📄 Lint JSON
+        run: find . -type f -name "*.json" -not -path "*/node_modules/*" -not -path "*/.git/*" -print0 | xargs -0 -n 1 jsonlint -q
+
+      - name: 📋 Check Extension Schema
+        run: ajv validate -s .github/schemas/extension-schema.json -d gemini-extension.json
+
+      - name: 📝 Lint Markdown
+        run: markdownlint "**/*.md" --config .markdownlint.json --ignore node_modules --ignore .git
+
+      - name: ⚙️ Lint TOML
+        run: taplo check "commands/**/*.toml"
+
+      - name: 🏗️ Lint YAML
+        run: yamllint .
+
+  token-audit:
+    name: 📊 Token Audit
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: 📦 Install Dependencies
+        run: npm install
+
+      - name: 🧮 Run Audit
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: node scripts/audit-tokens.js
+
+  integration-test:
+    name: 🔌 Extension Install Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: 🛠️ Install Gemini CLI
+        run: npm install -g @google/gemini-cli
+
+      - name: 🔎 Validate Extension
+        run: gemini extensions validate .
+
+      - name: 💿 Install Extension
+        run: echo "Y" | gemini extensions install .
+
+      - name: ✅ Verify Listing
+        run: |
+          gemini extensions list
+          gemini extensions list | grep "scribe"
