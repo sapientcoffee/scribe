@@ -153,3 +153,15 @@ Every Pull Request is automatically tested via GitHub Actions to verify:
 *   **Linting:** All file formats (JSON, Markdown, YAML, TOML) are syntactically correct.
 *   **Installation:** The extension installs successfully in a fresh environment.
 *   **Validation:** The extension manifest is valid according to the Gemini CLI schema.
+*   **Token Audit:** Estimates token usage for each command to ensure prompts remain efficient (< 4500 tokens).
+
+### CI Configuration
+
+To enable the Token Audit in your fork or repository, you must provide a Gemini API Key.
+
+1.  Get an API Key from [Google AI Studio](https://aistudio.google.com/).
+2.  Go to your GitHub Repository **Settings** > **Secrets and variables** > **Actions**.
+3.  Create a **New repository secret** named `GEMINI_API_KEY`.
+4.  Paste your API key value.
+
+Without this key, the CI workflow will fail.
