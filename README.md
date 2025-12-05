@@ -135,6 +135,10 @@ graph LR
         
         GitHub --> Manifest
         GitHub --> Syntax
+        Script --> Linting["Linter Checks<br/>(JSON, MD, TOML, YAML)"]
+        Script --> Audit[Token Audit]
+        
+        GitHub --> Linting
         GitHub --> Audit
         GitHub --> Quality["Quality Assurance<br/>(Promptfoo)"]
         GitHub --> Validation["Extension Validation<br/>(Install & List)"]
