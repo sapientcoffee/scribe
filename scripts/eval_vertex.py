@@ -7,7 +7,7 @@ from datetime import datetime
 from vertexai.preview.evaluation import EvalTask, PointwiseMetric, MetricPromptTemplateExamples
 
 # --- Configuration ---
-PROJECT_ID = os.getenv("GOOGLE_CLOUD_PROJECT")
+PROJECT_ID = os.getenv("PROJECT_ID") or os.getenv("GOOGLE_CLOUD_PROJECT")
 LOCATION = "us-central1" # Vertex AI Eval is strictly regional (mostly us-central1)
 FILE_PATH = "scribe/history-and-application-of-coffee-in-the-uk/BLUEPRINT.md"
 
