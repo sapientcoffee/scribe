@@ -129,7 +129,7 @@ graph LR
     Developer -->|Push / PR| GitHub[GitHub Actions]:::external
 
     subgraph "Automated Checks"
-        Script --> Linting[Linter Checks]
+        Script --> Linting["Linter Checks<br/>(JSON, MD, TOML, YAML)"]
         Script --> Audit[Token Audit]
         
         GitHub --> Linting
