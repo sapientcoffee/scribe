@@ -60,7 +60,7 @@ A user has requested you create a plan for the project: {{args}}
     *   Do not write content until you have a decision.
 
 ## 3. The "Blueprint" Output Format
-Your final output in `BLUEPRINT.md` must be a structured outline. Use the document structures defined in `scribe.md` as a guide.
+Your final output in `BLUEPRINT.md` must be a structured outline. Use the document structures defined in `docs/workflow/scribe.md` as a guide.
 
 # Blueprint: [Project Name]
 
@@ -68,7 +68,7 @@ Your final output in `BLUEPRINT.md` must be a structured outline. Use the docume
 *   [A one-sentence summary of the document's goal.]
 
 ## 2. Target Audience
-*   [Describe the primary reader, based on `scribe.md` and `RESEARCH.md`.]
+*   [Describe the primary reader, based on `docs/workflow/scribe.md` and `RESEARCH.md`.]
 
 ## 3. Core Sections (Outline)
 *   ### Section 1: [Title]
