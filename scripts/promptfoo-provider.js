@@ -28,7 +28,19 @@ class GeminiProvider {
     try {
       const result = await this.model.generateContent(prompt);
       const response = result.response;
-      const text = response.text();
+      
+      let text = "";
+      try {
+        text = response.text();
+      } catch (e) {
+        // If text() fails, it's likely a function call
+        const calls = response.functionCalls();
+        if (calls && calls.length > 0) {
+          text = `[Tool Call]: ${calls[0].name}(${JSON.stringify(calls[0].args)})`;
+        } else {
+          text = "[No Content]"; 
+        }
+      }
       
       // Extract usage metadata
       const usage = response.usageMetadata || {};
