@@ -2,6 +2,8 @@ import os
 import sys
 import vertexai
 import pandas as pd
+import google.cloud.aiplatform as aiplatform
+from datetime import datetime
 from vertexai.preview.evaluation import EvalTask, PointwiseMetric, MetricPromptTemplateExamples
 
 # --- Configuration ---
@@ -16,10 +18,11 @@ if not PROJECT_ID:
 def run_vertex_eval():
     print(f"🤖 Initializing Vertex AI Eval (Project: {PROJECT_ID})...")
     
-    # Initialize with Experiment Tracking enabled
-    # We explicitly set the staging_bucket (optional but good practice) if you have one, 
-    # but here we just set the experiment name.
-    vertexai.init(
+    # Initialize Vertex AI (for EvalTask)
+    vertexai.init(project=PROJECT_ID, location=LOCATION)
+    
+    # Initialize AI Platform (for Experiment Tracking)
+    aiplatform.init(
         project=PROJECT_ID, 
         location=LOCATION,
         experiment="scribe-eval-demo"
@@ -53,6 +56,9 @@ def run_vertex_eval():
     }
 
     # 3. Run the Evaluation Task
+    # Create a unique run ID
+    run_id = f"eval-run-{datetime.now().strftime('%Y%m%d-%H%M%S')}"
+
     # We must provide the 'prompt' so the metrics can evaluate the context
     eval_task = EvalTask(
         dataset=pd.DataFrame({
@@ -68,6 +74,7 @@ def run_vertex_eval():
     )
 
     print("⚖️  Running Vertex AI Evaluation...")
+    
     result = eval_task.evaluate()
 
     print("\n📊 Vertex AI Evaluation Results:")
