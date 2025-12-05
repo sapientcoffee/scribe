@@ -94,7 +94,7 @@ def run_vertex_eval():
 
 {result.metrics_table.to_markdown()}
 
-[🔗 View in Console](https://console.cloud.google.com/vertex-ai/experiments/experiments/scribe-eval-demo?project={PROJECT_ID}&m={LOCATION})
+[🔗 View in Console](https://console.cloud.google.com/vertex-ai/experiments/locations/{LOCATION}/experiments/scribe-eval-demo/runs?project={PROJECT_ID})
 """
     
     # Write to file for GitHub Actions
@@ -121,7 +121,7 @@ def run_vertex_eval():
         sys.exit(0)
 
     print("\n🔗 View Experiment History:")
-    print(f"https://console.cloud.google.com/vertex-ai/experiments/experiments/scribe-eval-demo?project={PROJECT_ID}&m={LOCATION}")
+    print(f"https://console.cloud.google.com/vertex-ai/experiments/locations/{LOCATION}/experiments/scribe-eval-demo/runs?project={PROJECT_ID}")
 
 if __name__ == "__main__":
     run_vertex_eval()
