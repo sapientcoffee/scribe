@@ -129,18 +129,9 @@ graph LR
     subgraph "Automated Checks"
         Script --> Linting[Linter Checks]
         Script --> Audit[Token Audit]
-        
-        GitHub --> Linting
+        GitHub --> Linting["Linter Checks<br/>(JSON, Markdown, TOML, YAML)"]
         GitHub --> Audit
         GitHub --> Validation["Extension Validation<br/>(Install & List)"]
-        
-        GitHub --> EvalFlow[Evaluation Pipeline]
-    end
-
-    subgraph "Evaluation Pipeline"
-        EvalFlow --> CustomJudge["Custom Judge (Node.js)<br/>Run CLI -> Generate Content"]
-        CustomJudge -->|Passes Artifact| VertexEval["Vertex AI Eval (Python)<br/>Compute Metrics"]
-        VertexEval -->|Logs to| VertexConsole[Vertex AI Experiments]
     end
 ```
 
