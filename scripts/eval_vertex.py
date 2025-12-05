@@ -1,5 +1,6 @@
 import os
 import sys
+import json
 import vertexai
 import pandas as pd
 import google.cloud.aiplatform as aiplatform
@@ -36,7 +37,19 @@ def run_vertex_eval():
     with open(FILE_PATH, "r") as f:
         response_text = f.read()
 
-    # 2. Define a Custom Metric (e.g., "Blueprint Adherence")
+    # 2. Load Golden Reference (from eval_dataset.jsonl)
+    reference_text = ""
+    try:
+        with open("eval_dataset.jsonl", "r") as f:
+            # Take the first example as our "Golden Standard" for structure
+            first_line = f.readline()
+            if first_line:
+                data = json.loads(first_line)
+                reference_text = data.get("reference", "")
+    except Exception as e:
+        print(f"⚠️  Could not load golden reference: {e}")
+
+    # 3. Define a Custom Metric (e.g., "Blueprint Adherence")
     # We use a Pointwise metric because we are evaluating a single response without a reference.
     blueprint_metric = PointwiseMetric(
         metric="blueprint_adherence",
@@ -45,31 +58,25 @@ def run_vertex_eval():
         )
     )
 
-    # Alternatively, define a fully custom prompt criteria
-    custom_criteria = {
-        "blueprint_quality": """
-        Score the document on a scale of 1-5 based on:
-        1. Clarity of the Objective.
-        2. Specificity of the Target Audience.
-        3. Logical flow of the Core Sections.
-        """
-    }
-
-    # 3. Run the Evaluation Task
+    # 4. Run the Evaluation Task
     # Create a unique run ID
     run_id = f"eval-run-{datetime.now().strftime('%Y%m%d-%H%M%S')}"
 
     # We must provide the 'prompt' so the metrics can evaluate the context
+    # We add 'reference' to enable reference-based metrics like ROUGE
     eval_task = EvalTask(
         dataset=pd.DataFrame({
             "prompt": ["Create a blueprint for a guide on: History and application of coffee in the UK"],
-            "response": [response_text]
+            "response": [response_text],
+            "reference": [reference_text]
         }),
         metrics=[
-            # Built-in metrics
+            # Built-in Pointwise Metrics
             "coherence",
             "safety",
-            # Custom metric definition would go here in a real implementation
+            # Reference-based Metrics (Golden Comparison)
+            "rouge", # Structural overlap
+            "question_answering_quality", # Semantic similarity
         ]
     )
 
