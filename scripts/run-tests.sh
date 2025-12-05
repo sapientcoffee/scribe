@@ -50,7 +50,14 @@ if ! command -v yamllint &> /dev/null; then
     YAMLLINT_CMD="$VENV_DIR/bin/yamllint"
 fi
 
-$YAMLLINT_CMD .
+# Use find to explicitly select files and avoid linting vendor/env directories
+find . -type f \( -name "*.yaml" -o -name "*.yml" \) \
+    -not -path "*/node_modules/*" \
+    -not -path "*/.git/*" \
+    -not -path "*/.venv/*" \
+    -not -path "*/.lint-venv/*" \
+    -print0 | xargs -0 -r $YAMLLINT_CMD
+
 echo "✅ YAML check passed."
 
 echo "--------------------------------------------------"
