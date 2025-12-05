@@ -71,14 +71,14 @@ async function runAudit() {
     console.log("====================\n");
 
     // 1. Base Context
-    const baseContent = getFileContent('scribe.md');
+    const baseContent = getFileContent('docs/workflow/scribe.md');
     const baseStatic = getStaticCount(baseContent);
     const baseApi = await getApiCount(baseContent);
     
     // Use API count if available, otherwise fallback (though script exits if no key)
     const baseUsed = baseApi !== null ? baseApi : baseStatic;
     
-    console.log(`🔹 Base Context (scribe.md):`);
+    console.log(`🔹 Base Context (docs/workflow/scribe.md):`);
     console.log(`   API: \x1b[33m${baseApi !== null ? baseApi : 'N/A'}\x1b[0m`);
     console.log(`   Est: \x1b[36m${baseStatic}\x1b[0m\n`);
 

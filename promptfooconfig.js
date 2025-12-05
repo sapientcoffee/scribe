@@ -12,8 +12,8 @@ function extractPromptFromToml(filePath) {
   throw new Error(`Could not extract prompt from ${filePath}`);
 }
 
-// Read the base context (scribe.md)
-// Note: In the real CLI, scribe.md is the "context" and the TOML prompt is the "user message".
+// Read the base context (docs/workflow/scribe.md)
+// Note: In the real CLI, docs/workflow/scribe.md is the "context" and the TOML prompt is the "user message".
 // But often the CLI concatenates them or sends them as System + User.
 // The TOML prompt in this extension ALREADY includes the System Prompt content (Copy-Pasted).
 // Wait, looking at the `read_file` output of `commands/scribe/plan.toml` above...

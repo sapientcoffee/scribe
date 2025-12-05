@@ -5,7 +5,7 @@
 
 ## Context
 
-The Scribe extension originally used a "Monolithic Context" architecture. A single, massive `scribe.md` file was defined in `gemini-extension.json` as the `contextFileName`. This meant that **every** interaction with the CLI loaded the entire system prompt (all personas, all workflows, all rules), regardless of the specific command being executed.
+The Scribe extension originally used a "Monolithic Context" architecture. A single, massive `scribe.md` file (now located at `docs/workflow/scribe.md`) was defined in `gemini-extension.json` as the `contextFileName`. This meant that **every** interaction with the CLI loaded the entire system prompt (all personas, all workflows, all rules), regardless of the specific command being executed.
 
 **Problems:**
 
