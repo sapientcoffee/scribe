@@ -16,8 +16,18 @@ echo "✅ Manifest schema check passed."
 
 echo "--------------------------------------------------"
 echo "📄 Linting JSON..."
-# Use npx to run jsonlint
-find . -type f -name "*.json" -not -path "*/node_modules/*" -not -path "*/.git/*" -print0 | xargs -0 -n 1 npx -y jsonlint -q
+
+# Optimization: Avoid npx overhead for every file by finding/installing binary once
+JSONLINT_CMD="jsonlint"
+if ! command -v jsonlint &> /dev/null; then
+    if [ ! -f "./node_modules/.bin/jsonlint" ]; then
+         echo "📦 Installing jsonlint locally for speed..."
+         npm install --no-save --silent jsonlint
+    fi
+    JSONLINT_CMD="./node_modules/.bin/jsonlint"
+fi
+
+find . -type f -name "*.json" -not -path "*/node_modules/*" -not -path "*/.git/*" -print0 | xargs -0 -n 1 $JSONLINT_CMD -q
 echo "✅ JSON check passed."
 
 echo "--------------------------------------------------"
