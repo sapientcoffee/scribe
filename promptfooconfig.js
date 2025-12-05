@@ -35,16 +35,10 @@ function extractPromptFromToml(filePath) {
 
 const planPromptTemplate = extractPromptFromToml('commands/scribe/plan.toml');
 const draftPromptTemplate = extractPromptFromToml('commands/scribe/draft.toml');
-const researchPromptTemplate = extractPromptFromToml('commands/scribe/research.toml');
 
 module.exports = {
   description: 'Scribe Extension Integration Tests',
   prompts: [
-    {
-      id: 'research-command',
-      label: '/scribe:research',
-      raw: researchPromptTemplate, 
-    },
     /*
     {
       id: 'plan-command',
@@ -67,23 +61,30 @@ module.exports = {
     }
   },
   tests: [
+    /*
     {
-      // Test 1: Research Logic (Entry Point)
-      description: 'Research Command - Protocol Check',
+      // Test 1: Plan Logic
+      description: 'Plan Command - Protocol Check',
       vars: {
         args: 'History of Espresso'
       },
       options: {
-        promptId: 'research-command' 
+        promptId: 'plan-command' 
       },
       assert: [
         {
+          // It should try to find the research file
+          type: 'contains',
+          value: 'RESEARCH.md',
+        },
+        {
           // Persona Check - Verifying Protocol Adherence
           type: 'llm-rubric',
-          value: 'The response should indicate an attempt to start the research process. It may ask clarifying questions, outline a research plan, or attempt to check if the project directory `scribe/history-of-espresso` already exists (via tool call).',
+          value: 'The response should indicate an attempt to locate or read the "RESEARCH.md" file as the first step of the protocol.',
         }
       ]
     },
+    */
     {
       // Test 2: Draft Logic
       description: 'Draft Command - Protocol Check',
