@@ -123,15 +123,28 @@ We maintain high quality standards for this extension using automated linting an
 
 ```mermaid
 graph LR
+    classDef external fill:#f9f9f9,stroke:#333,stroke-width:2px,stroke-dasharray: 5 5;
+    
     Developer[Developer] -->|Run Locally| Script["./scripts/run-tests.sh"]
-    Developer -->|Push / PR| GitHub[GitHub Actions]
+    Developer -->|Push / PR| GitHub[GitHub Actions]:::external
 
     subgraph "Automated Checks"
         Script --> Linting[Linter Checks]
         Script --> Audit[Token Audit]
-        GitHub --> Linting["Linter Checks<br/>(JSON, Markdown, TOML, YAML)"]
+        
+        GitHub --> Linting
         GitHub --> Audit
         GitHub --> Validation["Extension Validation<br/>(Install & List)"]
+        
+        GitHub --> EvalFlow[Evaluation Pipeline]
+    end
+
+    subgraph "Evaluation Pipeline"
+        EvalFlow --> CustomJudge["Custom Judge (Node.js)<br/>Run CLI -> Generate Content"]
+        CustomJudge -->|Grading Prompt| Gemini[Gemini API]:::external
+        CustomJudge -->|Passes Artifact| VertexEval["Vertex AI Eval (Python)<br/>Compute Metrics"]
+        VertexEval -->|Compute| VertexAPI[Vertex AI Service]:::external
+        VertexAPI -->|Logs to| VertexConsole[Vertex Experiments]:::external
     end
 ```
 
