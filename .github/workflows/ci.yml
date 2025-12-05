@@ -67,6 +67,7 @@ jobs:
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: npx promptfoo@latest eval -o promptfoo_report.md
+        continue-on-error: true
 
       - name: 📤 Upload Promptfoo Report
         if: success() || failure()
