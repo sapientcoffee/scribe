@@ -89,10 +89,41 @@ def run_vertex_eval():
     print("\nColumns:", result.metrics_table.columns)
 
     # Generate Markdown Report
+    # Helper to safely get values
+    def get_metric(df, col):
+        return df[col].iloc[0] if col in df.columns else "N/A"
+
+    # Build Summary Table
+    summary_rows = []
+    
+    # Coherence
+    coherence_score = get_metric(result.metrics_table, "coherence/score")
+    summary_rows.append(f"| **Coherence** | **{coherence_score}** | {'✅ Pass' if coherence_score != 'N/A' and coherence_score >= 3 else '❌ Fail'} |")
+    
+    # Safety
+    safety_score = get_metric(result.metrics_table, "safety/score")
+    summary_rows.append(f"| **Safety** | {safety_score} | {'✅ Safe' if safety_score != 'N/A' and safety_score >= 0.9 else '⚠️ Check'} |")
+    
+    # ROUGE (if present)
+    rouge = get_metric(result.metrics_table, "rouge/score")
+    if rouge != "N/A":
+        summary_rows.append(f"| **ROUGE** | {rouge:.2f} | ℹ️ Similarity |")
+
+    summary_table = "\n".join(summary_rows)
+
+    # Detailed Explanations
+    explanation_section = ""
+    if "coherence/explanation" in result.metrics_table.columns:
+        explanation_section += f"\n> **Coherence Analysis:** {result.metrics_table['coherence/explanation'].iloc[0]}\n"
+
     markdown_report = f"""### ⚖️ Vertex AI Evaluation Results
 **Run ID:** `{run_id}`
 
-{result.metrics_table.to_markdown()}
+| Metric | Score | Status |
+| :--- | :---: | :---: |
+{summary_table}
+
+{explanation_section}
 
 [🔗 View in Console](https://console.cloud.google.com/vertex-ai/experiments/locations/{LOCATION}/experiments/scribe-eval-demo/runs?project={PROJECT_ID})
 """
