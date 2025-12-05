@@ -66,16 +66,30 @@ jobs:
       - name: 🧪 Run Promptfoo Eval
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-        run: npx promptfoo@latest eval -o promptfoo_report.md
+        run: npx promptfoo@latest eval -o promptfoo_report.json
         continue-on-error: true
 
-      - name: 📝 Ensure Report Exists
+      - name: 📝 Generate Markdown Report
         if: always()
         run: |
-          if [ ! -f promptfoo_report.md ]; then
-            echo "### ⚠️ Promptfoo Evaluation Failed" > promptfoo_report.md
-            echo "The evaluation command failed to generate a report. Check the CI logs." >> promptfoo_report.md
-          fi
+          node -e "
+          const fs = require('fs');
+          try {
+            if (!fs.existsSync('promptfoo_report.json')) throw new Error('Report missing');
+            const report = JSON.parse(fs.readFileSync('promptfoo_report.json', 'utf8'));
+            const stats = report.stats || {};
+            const pass = stats.successes || 0;
+            const fail = stats.failures || 0;
+            const markdown = '### 🧪 Semantic Quality (Promptfoo)\n\n' +
+              '| Metric | Count |\n' +
+              '| :--- | :---: |\n' +
+              '| **Pass** | ✅ ' + pass + ' |\n' +
+              '| **Fail** | ❌ ' + fail + ' |\n';
+            fs.writeFileSync('promptfoo_report.md', markdown);
+          } catch (e) {
+            fs.writeFileSync('promptfoo_report.md', '### ⚠️ Promptfoo Evaluation Failed\n\nScript failed to run or generate JSON.');
+          }
+          "
 
       - name: 📤 Upload Promptfoo Report
         if: success() || failure()
