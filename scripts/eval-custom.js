@@ -33,7 +33,7 @@ const JUDGE_CRITERIA = `
 function runGeminiCommand(prompt) {
     return new Promise((resolve, reject) => {
         console.log(`💻 Executing: gemini -p "${prompt}" --yolo`);
-        exec(`gemini -p '${prompt}' --yolo`, (error, stdout, stderr) => {
+        exec(`gemini -p '${prompt.replace(/'/g, "'\\''")}' --yolo`, (error, stdout, stderr) => {
             // We don't reject on error immediately because the CLI might output useful stderr
             // but we do log it.
             if (error && error.code !== 0) {
