@@ -88,6 +88,20 @@ def run_vertex_eval():
     print(result.metrics_table)
     print("\nColumns:", result.metrics_table.columns)
 
+    # Generate Markdown Report
+    markdown_report = f"""### ⚖️ Vertex AI Evaluation Results
+**Run ID:** `{run_id}`
+
+{result.metrics_table.to_markdown()}
+
+[🔗 View in Console](https://console.cloud.google.com/vertex-ai/experiments/experiments/scribe-eval-demo?project={PROJECT_ID}&m={LOCATION})
+"""
+    
+    # Write to file for GitHub Actions
+    if os.getenv("GITHUB_ACTIONS"):
+        with open("eval_results.md", "w") as f:
+            f.write(markdown_report)
+
     # Simple pass/fail logic on coherence
     # Note: Metrics are usually returned as 'metric_name/score'
     coherence_col = "coherence/score"

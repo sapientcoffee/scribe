@@ -6,6 +6,11 @@ on:
   push:
     branches: [ main, master ]
 
+permissions:
+  contents: read
+  id-token: write
+  pull-requests: write # Needed for commenting
+
 jobs:
   static-checks:
     name: 🔍 Static Analysis
@@ -89,3 +94,52 @@ jobs:
         run: |
           gemini extensions list
           gemini extensions list | grep "scribe"
+
+  vertex-eval:
+    name: ⚖️ Vertex AI Evaluation
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' # Only run on PRs where we can comment
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: 🔐 Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+
+      - name: 🛠️ Install Gemini CLI
+        run: npm install -g @google/gemini-cli
+
+      - name: 📦 Install Dependencies
+        run: |
+          npm install
+          pip install -r requirements.txt
+
+      - name: 🏃 Run Generator (Custom Script)
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: node scripts/eval-custom.js
+
+      - name: ⚖️ Run Evaluator (Vertex AI)
+        env:
+          PROJECT_ID: ${{ vars.GCP_PROJECT_ID }} # Using var for non-secret project ID
+        run: python scripts/eval_vertex.py
+
+      - name: 💬 Post Result to PR
+        uses: thollander/actions-comment-pull-request@v3
+        if: success() || failure() # Post even if low score fails the job
+        with:
+          file_path: eval_results.md
+          comment_tag: vertex_eval_result
