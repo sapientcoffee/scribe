@@ -65,9 +65,38 @@ async function runEval() {
         
         console.log(lastStdout.substring(0, 300) + "..."); // Log partial output
         
-        // Check for fatal errors in the output (heuristic)
-        // Note: "Error executing tool" might be recoverable by the agent, so be careful.
-        // We mostly care if the file was created.
+        // Check for fatal errors in the output
+        if (code !== 0) {
+             console.error("❌ Step failed with non-zero exit code.");
+             process.exit(1);
+        }
+
+        // Debug: Check file system state after Research step
+        if (cmd.includes("research")) {
+             const researchPath = `scribe/history-and-application-of-coffee-in-the-uk/RESEARCH.md`;
+             if (!fs.existsSync(researchPath)) {
+                 console.error(`❌ RESEARCH.md not found at expected path: ${researchPath}`);
+                 console.log("📂 Current scribe/ contents:");
+                 try {
+                    // Recursive ls
+                    const list = (dir) => {
+                        if (!fs.existsSync(dir)) return;
+                        const files = fs.readdirSync(dir);
+                        files.forEach(f => {
+                            const p = path.join(dir, f);
+                            const stat = fs.statSync(p);
+                            console.log(`${p} ${stat.isDirectory() ? '/' : ''}`);
+                            if (stat.isDirectory()) list(p);
+                        });
+                    };
+                    list('scribe');
+                 } catch(e) { console.error(e); }
+                 
+                 // Don't exit yet, let's see if the plan step fails (it will)
+             } else {
+                 console.log("✅ RESEARCH.md successfully created.");
+             }
+        }
     }
     
     // 2. Detect Generated File (BLUEPRINT.md)
