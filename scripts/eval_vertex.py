@@ -15,7 +15,15 @@ if not PROJECT_ID:
 
 def run_vertex_eval():
     print(f"🤖 Initializing Vertex AI Eval (Project: {PROJECT_ID})...")
-    vertexai.init(project=PROJECT_ID, location=LOCATION)
+    
+    # Initialize with Experiment Tracking enabled
+    # We explicitly set the staging_bucket (optional but good practice) if you have one, 
+    # but here we just set the experiment name.
+    vertexai.init(
+        project=PROJECT_ID, 
+        location=LOCATION,
+        experiment="scribe-eval-demo"
+    )
 
     # 1. Read the document to evaluate
     if not os.path.exists(FILE_PATH):
