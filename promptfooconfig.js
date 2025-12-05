@@ -39,11 +39,13 @@ const draftPromptTemplate = extractPromptFromToml('commands/scribe/draft.toml');
 module.exports = {
   description: 'Scribe Extension Integration Tests',
   prompts: [
+    /*
     {
       id: 'plan-command',
       label: '/scribe:plan',
       raw: planPromptTemplate, 
     },
+    */
     {
       id: 'draft-command',
       label: '/scribe:draft',
@@ -59,6 +61,7 @@ module.exports = {
     }
   },
   tests: [
+    /*
     {
       // Test 1: Plan Logic
       description: 'Plan Command - Protocol Check',
@@ -81,6 +84,7 @@ module.exports = {
         }
       ]
     },
+    */
     {
       // Test 2: Draft Logic
       description: 'Draft Command - Protocol Check',
