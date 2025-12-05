@@ -167,3 +167,30 @@ To enable the Token Audit in your fork or repository, you must provide a Gemini 
 4.  Paste your API key value.
 
 Without this key, the CI workflow will fail.
+
+## Evaluation & Quality Assurance
+
+To ensure the quality of the Scribe extension's outputs, we have implemented multiple evaluation strategies.
+
+### 1. Custom Judge Script (Node.js)
+This script runs an end-to-end test of the CLI commands and uses a "Judge" LLM (Gemini 3 Pro) to grade the generated content.
+
+*   **Usage:** `node scripts/eval-custom.js`
+*   **What it does:**
+    1.  Executes `/scribe:research` and `/scribe:plan` via the Gemini CLI (headless mode).
+    2.  Verifies the creation of `BLUEPRINT.md`.
+    3.  Sends the blueprint to Gemini 3 Pro with a grading rubric (Structure, Completeness, Formatting).
+    4.  Passes only if the score is high and the reasoning is positive.
+
+### 2. Vertex AI Evaluation (Enterprise)
+For more robust, metrics-based evaluation, we support the Vertex AI Evaluation Service.
+
+*   **Usage:** `source .venv/bin/activate && python scripts/eval_vertex.py`
+*   **Requirements:** Google Cloud Project with Vertex AI API enabled.
+*   **Metrics:**
+    *   **Coherence:** Auto-rated by a model.
+    *   **Safety:** Checked against safety filters.
+    *   **Custom Metrics:** Extendable via the Python SDK.
+
+### 3. Golden Dataset
+We maintain a "Golden Dataset" in `eval_dataset.jsonl` containing high-quality prompt/response pairs. This can be uploaded to the Vertex AI Console to run large-scale batch evaluations and track quality trends over time.
