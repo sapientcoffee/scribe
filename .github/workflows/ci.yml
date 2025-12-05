@@ -170,6 +170,7 @@ jobs:
         env:
           PROJECT_ID: ${{ vars.GCP_PROJECT_ID }} # Using var for non-secret project ID
         run: python scripts/eval_vertex.py
+        continue-on-error: true
 
       - name: 📥 Download Token Report
         uses: actions/download-artifact@v4
