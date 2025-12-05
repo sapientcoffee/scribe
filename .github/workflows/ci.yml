@@ -149,9 +149,17 @@ jobs:
           path: .
 
       - name: ➕ Combine Reports
+        if: success() || failure()
         run: |
-          if [ -f "token_report.md" ]; then
+          # Initialize file
+          touch eval_results.md
+          
+          if [ -f "custom_eval_report.md" ]; then
+            cat custom_eval_report.md >> eval_results.md
             echo -e "\n---\n" >> eval_results.md
+          fi
+          
+          if [ -f "token_report.md" ]; then
             cat token_report.md >> eval_results.md
           fi
 

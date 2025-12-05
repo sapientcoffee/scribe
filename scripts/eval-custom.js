@@ -165,6 +165,19 @@ async function runEval() {
         console.log("Pass:     ", metrics.pass ? "✅ YES" : "❌ NO");
         console.log("Reasoning:", metrics.reasoning);
         
+        // Write Report for CI
+        if (process.env.GITHUB_ACTIONS) {
+            const report = `### 🤖 Custom Judge Results (Node.js)
+| Metric | Value |
+| :--- | :--- |
+| **Score** | **${metrics.score}/10** |
+| **Status** | ${metrics.pass ? '✅ PASS' : '❌ FAIL'} |
+
+> **Judge Reasoning:** ${metrics.reasoning}
+`;
+            fs.writeFileSync("custom_eval_report.md", report);
+        }
+        
         if (!metrics.pass) process.exit(1);
 
     } catch (error) {
