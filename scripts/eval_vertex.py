@@ -92,5 +92,8 @@ def run_vertex_eval():
         # Don't fail hard on missing metric for this demo, just warn
         sys.exit(0)
 
+    print("\n🔗 View Experiment History:")
+    print(f"https://console.cloud.google.com/vertex-ai/experiments/experiments/scribe-eval-demo?project={PROJECT_ID}&m={LOCATION}")
+
 if __name__ == "__main__":
     run_vertex_eval()
