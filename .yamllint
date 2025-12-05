@@ -2,6 +2,7 @@ extends: default
 
 ignore: |
   .github/
+  node_modules/
 
 rules:
   document-start: disable
