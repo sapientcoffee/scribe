@@ -24,8 +24,8 @@ const TEST_SEQUENCE = [
     `/scribe:plan ${TOPIC_SLUG} -- You MUST read 'scribe/${TOPIC_SLUG}/RESEARCH.md' and use 'write_file' to create 'scribe/${TOPIC_SLUG}/BLUEPRINT.md'.`
 ];
 const JUDGE_CRITERIA = `
-1.  **Structure:** Does it follow the "Blueprint" format (Objective, Target Audience, Core Sections)?
-2.  **Completeness:** Are the sections logical for the given topic?
+1.  **Clarity:** Is the plan easy to understand and follow?
+2.  **Completeness:** Does it cover the topic of "${TOPIC}" in a logical way?
 3.  **Formatting:** Is it valid Markdown?
 `;
 
