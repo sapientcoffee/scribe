@@ -127,11 +127,20 @@ graph LR
     Developer -->|Push / PR| GitHub[GitHub Actions]
 
     subgraph "Automated Checks"
-        Script --> Linting
+        Script --> Linting[Linter Checks]
         Script --> Audit[Token Audit]
-        GitHub --> Linting["Linter Checks<br/>(JSON, Markdown, TOML, YAML)"]
+        
+        GitHub --> Linting
         GitHub --> Audit
         GitHub --> Validation["Extension Validation<br/>(Install & List)"]
+        
+        GitHub --> EvalFlow[Evaluation Pipeline]
+    end
+
+    subgraph "Evaluation Pipeline"
+        EvalFlow --> CustomJudge["Custom Judge (Node.js)<br/>Run CLI -> Generate Content"]
+        CustomJudge -->|Passes Artifact| VertexEval["Vertex AI Eval (Python)<br/>Compute Metrics"]
+        VertexEval -->|Logs to| VertexConsole[Vertex AI Experiments]
     end
 ```
 
@@ -183,14 +192,20 @@ This script runs an end-to-end test of the CLI commands and uses a "Judge" LLM (
     4.  Passes only if the score is high and the reasoning is positive.
 
 ### 2. Vertex AI Evaluation (Enterprise)
-For more robust, metrics-based evaluation, we support the Vertex AI Evaluation Service.
+For more robust, metrics-based evaluation, we support the Vertex AI Evaluation Service. This step runs automatically in CI/CD if Google Cloud credentials are provided.
 
 *   **Usage:** `source .venv/bin/activate && python scripts/eval_vertex.py`
-*   **Requirements:** Google Cloud Project with Vertex AI API enabled.
+*   **Requirements:**
+    1.  Google Cloud Project with **Vertex AI API** enabled.
+    2.  Service Account with `Vertex AI User` role.
+    3.  Python dependencies installed from `requirements.txt`.
 *   **Metrics:**
-    *   **Coherence:** Auto-rated by a model.
+    *   **Coherence:** Auto-rated by a model (Score 1-5).
     *   **Safety:** Checked against safety filters.
-    *   **Custom Metrics:** Extendable via the Python SDK.
+    *   **ROUGE:** Structural similarity against a "Golden Reference" (from `eval_dataset.jsonl`).
+*   **CI Configuration:**
+    *   Add `GCP_CREDENTIALS` (Service Account JSON Key) to GitHub Secrets.
+    *   Add `GEMINI_API_KEY` to GitHub Secrets.
 
 ### 3. Golden Dataset
 We maintain a "Golden Dataset" in `eval_dataset.jsonl` containing high-quality prompt/response pairs. This can be uploaded to the Vertex AI Console to run large-scale batch evaluations and track quality trends over time.
