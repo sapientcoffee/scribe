@@ -48,6 +48,26 @@ jobs:
       - name: 🏗️ Lint YAML
         run: yamllint .
 
+  quality-checks:
+    name: 🧪 Quality Assurance
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: 📦 Install Dependencies
+        run: npm install
+
+      - name: 🧪 Run Promptfoo Eval
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: npm run test:eval
+
   token-audit:
     name: 📊 Token Audit
     runs-on: ubuntu-latest

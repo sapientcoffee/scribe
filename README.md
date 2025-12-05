@@ -129,11 +129,14 @@ graph LR
     Developer -->|Push / PR| GitHub[GitHub Actions]:::external
 
     subgraph "Automated Checks"
-        Script --> Linting[Linter Checks]
-        Script --> Audit[Token Audit]
+        Script --> Manifest["Manifest Validation"]
+        Script --> Syntax["Syntax Linting<br/>(JSON, YAML, TOML, MD)"]
+        Script --> Audit["Token Audit"]
         
-        GitHub --> Linting
+        GitHub --> Manifest
+        GitHub --> Syntax
         GitHub --> Audit
+        GitHub --> Quality["Quality Assurance<br/>(Promptfoo)"]
         GitHub --> Validation["Extension Validation<br/>(Install & List)"]
         
         GitHub --> EvalFlow[Evaluation Pipeline]
@@ -153,7 +156,7 @@ graph LR
 To ensure your changes are valid before pushing, you can run the local test script:
 
 ```bash
-./scripts/run-tests.sh
+npm test
 ```
 
 This script checks for:
@@ -161,6 +164,19 @@ This script checks for:
 2. **Markdown Style:** Checks all `.md` files against our style guide.
 3. **TOML Validity:** Ensures command definitions in `commands/` are valid TOML.
 4. **YAML Syntax:** Validates GitHub Actions workflow files.
+
+### Semantic & Matrix Testing
+
+We use `promptfoo` to perform deep semantic testing of the extension's output.
+
+*   **Quality Check:** `npm run test:eval`
+    *   Tests if the "Architect" sounds like an architect.
+    *   Verifies formatting constraints (e.g., line length).
+*   **Model Matrix:** `npm run test:models`
+    *   Runs the same tests against multiple Gemini models (e.g., Gemini 3 Pro vs Gemini 2.0 Flash) side-by-side.
+    *   Useful for ensuring future-proofing and regression testing across model versions.
+
+### CI/CD Pipeline
 
 ### CI/CD Pipeline
 
