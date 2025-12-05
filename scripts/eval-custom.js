@@ -20,8 +20,8 @@ const TOPIC = "History and application of coffee in the UK";
 const TOPIC_SLUG = "history-and-application-of-coffee-in-the-uk";
 // Use quotes for the argument to ensure it's treated as a single string
 const TEST_SEQUENCE = [
-    `/scribe:research "${TOPIC}" -- DO NOT ASK QUESTIONS. EXECUTE IMMEDIATELY.`,
-    `/scribe:plan ${TOPIC_SLUG} -- EXECUTE IMMEDIATELY.`
+    `/scribe:research "${TOPIC}" -- You MUST use the 'write_file' tool to create 'scribe/${TOPIC_SLUG}/RESEARCH.md'. Do not just print the text.`,
+    `/scribe:plan ${TOPIC_SLUG} -- You MUST read 'scribe/${TOPIC_SLUG}/RESEARCH.md' and use 'write_file' to create 'scribe/${TOPIC_SLUG}/BLUEPRINT.md'.`
 ];
 const JUDGE_CRITERIA = `
 1.  **Structure:** Does it follow the "Blueprint" format (Objective, Target Audience, Core Sections)?
