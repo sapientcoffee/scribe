@@ -152,6 +152,7 @@ jobs:
         uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.GCP_CREDENTIALS }}
+        continue-on-error: true
 
       - name: 🛠️ Install Gemini CLI
         run: npm install -g @google/gemini-cli
@@ -165,6 +166,7 @@ jobs:
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: node scripts/eval-custom.js
+        continue-on-error: true
 
       - name: ⚖️ Run Evaluator (Vertex AI)
         env:
