@@ -30,8 +30,30 @@ class GeminiProvider {
       const response = result.response;
       const text = response.text();
       
+      // Extract usage metadata
+      const usage = response.usageMetadata || {};
+      
+      // Calculate Cost (Approximate)
+      let cost = 0;
+      const promptTokens = usage.promptTokenCount || 0;
+      const outputTokens = usage.candidatesTokenCount || 0;
+      
+      if (this.modelName.includes("flash")) {
+        // Flash Pricing: ~$0.075 / 1M Input, ~$0.30 / 1M Output
+        cost = (promptTokens / 1_000_000) * 0.075 + (outputTokens / 1_000_000) * 0.30;
+      } else {
+        // Pro Pricing (Default): ~$3.50 / 1M Input, ~$10.50 / 1M Output
+        cost = (promptTokens / 1_000_000) * 3.50 + (outputTokens / 1_000_000) * 10.50;
+      }
+
       return {
         output: text,
+        tokenUsage: {
+          total: usage.totalTokenCount,
+          prompt: usage.promptTokenCount,
+          completion: usage.candidatesTokenCount,
+        },
+        cost: cost
       };
     } catch (error) {
       console.error(`DEBUG: API Error (${this.modelName}):`, error);
