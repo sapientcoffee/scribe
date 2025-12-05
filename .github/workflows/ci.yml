@@ -69,6 +69,14 @@ jobs:
         run: npx promptfoo@latest eval -o promptfoo_report.md
         continue-on-error: true
 
+      - name: 📝 Ensure Report Exists
+        if: always()
+        run: |
+          if [ ! -f promptfoo_report.md ]; then
+            echo "### ⚠️ Promptfoo Evaluation Failed" > promptfoo_report.md
+            echo "The evaluation command failed to generate a report. Check the CI logs." >> promptfoo_report.md
+          fi
+
       - name: 📤 Upload Promptfoo Report
         if: success() || failure()
         uses: actions/upload-artifact@v4
@@ -185,6 +193,7 @@ jobs:
         with:
           name: promptfoo-report
           path: .
+        continue-on-error: true
 
       - name: ➕ Combine Reports
         if: success() || failure()
