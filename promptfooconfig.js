@@ -61,7 +61,7 @@ module.exports = {
   tests: [
     {
       // Test 1: Plan Logic
-      description: 'Plan Command - Structure Check',
+      description: 'Plan Command - Protocol Check',
       vars: {
         args: 'History of Espresso'
       },
@@ -70,28 +70,20 @@ module.exports = {
       },
       assert: [
         {
+          // It should try to find the research file
           type: 'contains',
-          value: '# Blueprint:',
-          weight: 1
+          value: 'RESEARCH.md',
         },
         {
-          type: 'contains',
-          value: '## 1. Objective',
-        },
-        {
-          type: 'contains',
-          value: '## 3. Core Sections',
-        },
-        {
-          // Persona Check
+          // Persona Check - Verifying Protocol Adherence
           type: 'llm-rubric',
-          value: 'The output should strictly follow the "Blueprint" output format defined in the prompt.',
+          value: 'The response should indicate an attempt to locate or read the "RESEARCH.md" file as the first step of the protocol.',
         }
       ]
     },
     {
-      // Test 2: Draft Logic (Tone)
-      description: 'Draft Command - Tone Check',
+      // Test 2: Draft Logic
+      description: 'Draft Command - Protocol Check',
       vars: {
         args: 'History of Espresso'
       },
@@ -100,13 +92,13 @@ module.exports = {
       },
       assert: [
         {
-          type: 'llm-rubric',
-          value: 'The response should acknowledge the need to find BLUEPRINT.md and RESEARCH.md before writing.',
+          // It should try to find the blueprint
+          type: 'contains',
+          value: 'BLUEPRINT.md',
         },
         {
-           // Constraints Check
-           type: 'not-contains',
-           value: 'I will ignore the style guide'
+          type: 'llm-rubric',
+          value: 'The response should acknowledge the need to find BLUEPRINT.md and RESEARCH.md before writing.',
         }
       ]
     }
