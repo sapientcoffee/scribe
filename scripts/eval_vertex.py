@@ -94,10 +94,8 @@ def run_vertex_eval():
 
     print("⚖️  Running Vertex AI Evaluation (Judge: Gemini 3 Pro)...")
     
-    # Explicitly use a powerful model for the judging
-    result = eval_task.evaluate(
-        model=GenerativeModel("gemini-3-pro-preview")
-    )
+    # Run evaluation (BYOR mode - utilizing the 'response' column in dataset)
+    result = eval_task.evaluate()
 
     print("\n📊 Vertex AI Evaluation Results:")
     print(result.metrics_table)
