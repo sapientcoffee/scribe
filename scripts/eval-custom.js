@@ -16,11 +16,12 @@ const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
 const model = genAI.getGenerativeModel({ model: MODEL_NAME });
 
 // --- Test Definition ---
-const TOPIC = "A beginners guide to using Git";
+const TOPIC = "History and application of coffee in the UK";
+const TOPIC_SLUG = "history-and-application-of-coffee-in-the-uk";
 // Use quotes for the argument to ensure it's treated as a single string
 const TEST_SEQUENCE = [
     `/scribe:research "${TOPIC}" -- DO NOT ASK QUESTIONS. EXECUTE IMMEDIATELY.`,
-    `/scribe:plan "${TOPIC}" -- EXECUTE IMMEDIATELY.`
+    `/scribe:plan ${TOPIC_SLUG} -- EXECUTE IMMEDIATELY.`
 ];
 const JUDGE_CRITERIA = `
 1.  **Structure:** Does it follow the "Blueprint" format (Objective, Target Audience, Core Sections)?

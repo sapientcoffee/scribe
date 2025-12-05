@@ -6,7 +6,7 @@ from vertexai.preview.evaluation import EvalTask, PointwiseMetric, MetricPromptT
 # --- Configuration ---
 PROJECT_ID = os.getenv("GOOGLE_CLOUD_PROJECT")
 LOCATION = os.getenv("GOOGLE_CLOUD_LOCATION", "us-central1")
-FILE_PATH = "scribe/a-beginners-guide-to-using-git/BLUEPRINT.md"
+FILE_PATH = "scribe/history-and-application-of-coffee-in-the-uk/BLUEPRINT.md"
 
 if not PROJECT_ID:
     print("⚠️  Skipping Vertex AI Eval: GOOGLE_CLOUD_PROJECT not set.")
