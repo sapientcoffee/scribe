@@ -2,6 +2,7 @@ import os
 import sys
 import json
 import vertexai
+from vertexai.generative_models import GenerativeModel
 import pandas as pd
 import google.cloud.aiplatform as aiplatform
 from datetime import datetime
@@ -95,7 +96,7 @@ def run_vertex_eval():
     
     # Explicitly use a powerful model for the judging
     result = eval_task.evaluate(
-        model=vertexai.GenerativeModel("gemini-3-pro-preview")
+        model=GenerativeModel("gemini-3-pro-preview")
     )
 
     print("\n📊 Vertex AI Evaluation Results:")
