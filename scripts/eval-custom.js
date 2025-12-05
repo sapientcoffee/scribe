@@ -127,7 +127,8 @@ async function runEval() {
     try {
         const evalResult = await model.generateContent(prompt);
         const evalText = evalResult.response.text();
-        const cleanJson = evalText.replace(/```json/g, '').replace(/```/g, '').trim();
+        const jsonMatch = evalText.match(/\{[\s\S]*\}/);
+        const cleanJson = jsonMatch ? jsonMatch[0] : evalText;
         
         const metrics = JSON.parse(cleanJson);
         console.log("\n📊 Evaluation Results:");
