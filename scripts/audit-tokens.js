@@ -136,6 +136,25 @@ async function runAudit() {
     console.log("\n====================");
     console.log("Legend: API = Gemini 3 Pro (Exact) | Est = GPT-4 Tokenizer (Approximate)");
 
+    // Generate Markdown Report for CI
+    if (process.env.GITHUB_ACTIONS) {
+        let mdLines = [];
+        mdLines.push("### 🪙 Token Usage Audit");
+        mdLines.push("| Command | API Count | Est. Count | Status |");
+        mdLines.push("| :--- | :---: | :---: | :---: |");
+        
+        commandData.forEach(cmd => {
+            const apiStr = cmd.totalApi !== null ? cmd.totalApi : "N/A";
+            const status = cmd.officialTotal > MAX_TOKENS ? "⚠️ Excessive" : "✅ OK";
+            mdLines.push(`| \`${cmd.name}\` | ${apiStr} | ${cmd.totalStatic} | ${status} |`);
+        });
+        
+        mdLines.push(`\n> **Base Context:** ${baseUsed} tokens`);
+        if (!USE_API) mdLines.push("> *Note: Using static estimation (GPT-4 tokenizer).*");
+        
+        fs.writeFileSync("token_report.md", mdLines.join("\n"));
+    }
+
     if (hasError) {
         console.error(`\n❌ FAILED: One or more commands exceed the ${MAX_TOKENS} token limit.`);
         process.exit(1);

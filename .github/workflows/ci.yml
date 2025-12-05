@@ -68,6 +68,13 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: node scripts/audit-tokens.js
 
+      - name: 📤 Upload Token Report
+        if: success() || failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: token-report
+          path: token_report.md
+
   integration-test:
     name: 🔌 Extension Install Test
     runs-on: ubuntu-latest
@@ -134,6 +141,19 @@ jobs:
         env:
           PROJECT_ID: ${{ vars.GCP_PROJECT_ID }} # Using var for non-secret project ID
         run: python scripts/eval_vertex.py
+
+      - name: 📥 Download Token Report
+        uses: actions/download-artifact@v4
+        with:
+          name: token-report
+          path: .
+
+      - name: ➕ Combine Reports
+        run: |
+          if [ -f "token_report.md" ]; then
+            echo -e "\n---\n" >> eval_results.md
+            cat token_report.md >> eval_results.md
+          fi
 
       - name: 💬 Post Result to PR
         uses: thollander/actions-comment-pull-request@v3
