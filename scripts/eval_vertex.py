@@ -2,6 +2,7 @@ import os
 import sys
 import json
 import vertexai
+from vertexai.generative_models import GenerativeModel
 import pandas as pd
 import google.cloud.aiplatform as aiplatform
 from datetime import datetime
@@ -49,21 +50,29 @@ def run_vertex_eval():
     except Exception as e:
         print(f"⚠️  Could not load golden reference: {e}")
 
-    # 3. Define a Custom Metric (e.g., "Blueprint Adherence")
-    # We use a Pointwise metric because we are evaluating a single response without a reference.
+    # 3. Define a Custom Metric: "Blueprint Adherence"
+    # This checks if the output follows the strict Scribe structure.
+    blueprint_criteria = """
+    You are assessing a document blueprint. It must contain these specific headers:
+    1. "Objective"
+    2. "Target Audience"
+    3. "Core Sections"
+    4. "Special Requirements"
+    
+    Score 5: All headers are present and sections are well-detailed.
+    Score 3: Most headers are present but content is vague.
+    Score 1: Missing key headers or completely wrong format.
+    """
+    
     blueprint_metric = PointwiseMetric(
         metric="blueprint_adherence",
-        metric_prompt_template=MetricPromptTemplateExamples.get_prompt_template(
-            "fluency" # We use 'fluency' as a base structure but could customize the definition
-        )
+        metric_prompt_template=blueprint_criteria
     )
 
     # 4. Run the Evaluation Task
     # Create a unique run ID
     run_id = f"eval-run-{datetime.now().strftime('%Y%m%d-%H%M%S')}"
 
-    # We must provide the 'prompt' so the metrics can evaluate the context
-    # We add 'reference' to enable reference-based metrics like ROUGE
     eval_task = EvalTask(
         dataset=pd.DataFrame({
             "prompt": ["Create a blueprint for a guide on: History and application of coffee in the UK"],
@@ -71,17 +80,21 @@ def run_vertex_eval():
             "reference": [reference_text]
         }),
         metrics=[
+            # Custom Metric
+            blueprint_metric,
             # Built-in Pointwise Metrics
             "coherence",
             "safety",
             # Reference-based Metrics (Golden Comparison)
-            "rouge", # Structural overlap
-            "question_answering_quality", # Semantic similarity
-        ]
+            "rouge", 
+            "question_answering_quality", 
+        ],
+        experiment="scribe-eval-demo"
     )
 
-    print("⚖️  Running Vertex AI Evaluation...")
+    print("⚖️  Running Vertex AI Evaluation (Judge: Gemini 3 Pro)...")
     
+    # Run evaluation (BYOR mode - utilizing the 'response' column in dataset)
     result = eval_task.evaluate()
 
     print("\n📊 Vertex AI Evaluation Results:")
