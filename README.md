@@ -127,7 +127,7 @@ graph LR
     Developer -->|Push / PR| GitHub[GitHub Actions]
 
     subgraph "Automated Checks"
-        Script --> Linting
+        Script --> Linting[Linter Checks]
         Script --> Audit[Token Audit]
         GitHub --> Linting["Linter Checks<br/>(JSON, Markdown, TOML, YAML)"]
         GitHub --> Audit
@@ -167,3 +167,36 @@ To enable the Token Audit in your fork or repository, you must provide a Gemini 
 4.  Paste your API key value.
 
 Without this key, the CI workflow will fail.
+
+## Evaluation & Quality Assurance
+
+To ensure the quality of the Scribe extension's outputs, we have implemented multiple evaluation strategies.
+
+### 1. Custom Judge Script (Node.js)
+This script runs an end-to-end test of the CLI commands and uses a "Judge" LLM (Gemini 3 Pro) to grade the generated content.
+
+*   **Usage:** `node scripts/eval-custom.js`
+*   **What it does:**
+    1.  Executes `/scribe:research` and `/scribe:plan` via the Gemini CLI (headless mode).
+    2.  Verifies the creation of `BLUEPRINT.md`.
+    3.  Sends the blueprint to Gemini 3 Pro with a grading rubric (Structure, Completeness, Formatting).
+    4.  Passes only if the score is high and the reasoning is positive.
+
+### 2. Vertex AI Evaluation (Enterprise)
+For more robust, metrics-based evaluation, we support the Vertex AI Evaluation Service. This step runs automatically in CI/CD if Google Cloud credentials are provided.
+
+*   **Usage:** `source .venv/bin/activate && python scripts/eval_vertex.py`
+*   **Requirements:**
+    1.  Google Cloud Project with **Vertex AI API** enabled.
+    2.  Service Account with `Vertex AI User` role.
+    3.  Python dependencies installed from `requirements.txt`.
+*   **Metrics:**
+    *   **Coherence:** Auto-rated by a model (Score 1-5).
+    *   **Safety:** Checked against safety filters.
+    *   **ROUGE:** Structural similarity against a "Golden Reference" (from `eval_dataset.jsonl`).
+*   **CI Configuration:**
+    *   Add `GCP_CREDENTIALS` (Service Account JSON Key) to GitHub Secrets.
+    *   Add `GEMINI_API_KEY` to GitHub Secrets.
+
+### 3. Golden Dataset
+We maintain a "Golden Dataset" in `eval_dataset.jsonl` containing high-quality prompt/response pairs. This can be uploaded to the Vertex AI Console to run large-scale batch evaluations and track quality trends over time.

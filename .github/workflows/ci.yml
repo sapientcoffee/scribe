@@ -6,6 +6,10 @@ on:
   push:
     branches: [ main, master ]
 
+permissions:
+  contents: read
+  pull-requests: write # Needed for commenting
+
 jobs:
   static-checks:
     name: 🔍 Static Analysis
@@ -64,6 +68,13 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: node scripts/audit-tokens.js
 
+      - name: 📤 Upload Token Report
+        if: success() || failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: token-report
+          path: token_report.md
+
   integration-test:
     name: 🔌 Extension Install Test
     runs-on: ubuntu-latest
@@ -89,3 +100,72 @@ jobs:
         run: |
           gemini extensions list
           gemini extensions list | grep "scribe"
+
+  vertex-eval:
+    name: ⚖️ Vertex AI Evaluation
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' # Only run on PRs where we can comment
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: 🔐 Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_CREDENTIALS }}
+
+      - name: 🛠️ Install Gemini CLI
+        run: npm install -g @google/gemini-cli
+
+      - name: 📦 Install Dependencies
+        run: |
+          npm install
+          pip install -r requirements.txt
+
+      - name: 🏃 Run Generator (Custom Script)
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: node scripts/eval-custom.js
+
+      - name: ⚖️ Run Evaluator (Vertex AI)
+        env:
+          PROJECT_ID: ${{ vars.GCP_PROJECT_ID }} # Using var for non-secret project ID
+        run: python scripts/eval_vertex.py
+
+      - name: 📥 Download Token Report
+        uses: actions/download-artifact@v4
+        with:
+          name: token-report
+          path: .
+
+      - name: ➕ Combine Reports
+        if: success() || failure()
+        run: |
+          # Initialize file
+          touch eval_results.md
+          
+          if [ -f "custom_eval_report.md" ]; then
+            cat custom_eval_report.md >> eval_results.md
+            echo -e "\n---\n" >> eval_results.md
+          fi
+          
+          if [ -f "token_report.md" ]; then
+            cat token_report.md >> eval_results.md
+          fi
+
+      - name: 💬 Post Result to PR
+        uses: thollander/actions-comment-pull-request@v3
+        if: success() || failure() # Post even if low score fails the job
+        with:
+          file-path: eval_results.md
+          comment-tag: vertex_eval_result
